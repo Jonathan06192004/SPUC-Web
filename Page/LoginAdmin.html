@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="../Styles/LoginAdmin.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Admin Login</h2>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter username" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <p class="forgot">Forgot Password?</p>
+        <p id="error" style="color:red; margin-top:10px;"></p>
+    </div>
+
+<script>
+    const form = document.getElementById("loginForm");
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        // Sample admin credentials
+        const adminUser = "admin";
+        const adminPass = "1234";
+
+        if (username === adminUser && password === adminPass) {
+            // Save login status
+            localStorage.setItem("isAdminLoggedIn", "true");
+
+            // Redirect to Admin Dashboard
+            window.location.href = "AdminDashboard.html";
+        } else {
+            document.getElementById("error").innerText = "Invalid username or password.";
+        }
+    });
+</script>
+
+</body>
+</html>

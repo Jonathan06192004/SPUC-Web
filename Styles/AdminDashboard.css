@@ -1,0 +1,319 @@
+/* CSS Variables */
+:root {
+    --hope-navy: #2c3e50;
+    --hope-orange: #ff8200;
+    --hope-light-gray: #f4f7f6;
+    --white: #ffffff;
+    --text-muted: #666;
+    --success-green: #27ae60;
+    --danger-red: #e74c3c;
+    --warning-yellow: #f39c12;
+    --shadow-light: 0 4px 20px rgba(44, 62, 80, 0.08);
+    --shadow-medium: 0 8px 30px rgba(44, 62, 80, 0.12);
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--hope-light-gray);
+    margin: 0;
+    padding: 30px 20px;
+    line-height: 1.6;
+    color: var(--hope-navy);
+}
+
+/* Dashboard Container */
+.dashboard {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--white);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    position: relative;
+}
+
+.dashboard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--hope-orange), #ff9500);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Headers */
+h1 {
+    color: var(--hope-navy);
+    margin-bottom: 10px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+h2 {
+    color: var(--hope-navy);
+    margin-bottom: 25px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--hope-light-gray);
+    padding-bottom: 10px;
+}
+
+.dashboard > p {
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+}
+
+/* Form Container */
+.form-container {
+    margin-top: 40px;
+    padding: 30px;
+    background: #fafbfc;
+    border-radius: 10px;
+    border: 1px solid #e1e8ed;
+}
+
+/* Form Styles */
+form input {
+    width: 100%;
+    padding: 15px 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 2px solid #e1e8ed;
+    font-size: 15px;
+    background: var(--white);
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+form input:focus {
+    border-color: var(--hope-orange);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 130, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+form input::placeholder {
+    color: #a0a9b8;
+}
+
+/* Primary Button */
+form button {
+    background: linear-gradient(135deg, var(--hope-orange), #ff9500);
+    color: var(--white);
+    border: none;
+    padding: 16px 24px;
+    width: 100%;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(255, 130, 0, 0.3);
+}
+
+form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 130, 0, 0.4);
+}
+
+/* Event List */
+.event-list {
+    margin-top: 50px;
+}
+
+/* Enhanced Event Cards */
+.event-card {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #e1e8ed;
+    border-left: 5px solid var(--hope-orange);
+    transition: var(--transition);
+    position: relative;
+}
+
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-light);
+    border-left-color: var(--hope-navy);
+}
+
+.event-card strong {
+    color: var(--hope-orange);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.event-card h3 {
+    color: var(--hope-navy);
+    margin: 10px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.event-card p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* Button Groups */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-group button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: var(--transition);
+    flex: 1;
+}
+
+.btn-group button:not(.delete) {
+    background-color: var(--hope-navy);
+    color: var(--white);
+}
+
+.btn-group button:not(.delete):hover {
+    background-color: #34495e;
+    transform: translateY(-1px);
+}
+
+.btn-group .delete {
+    background-color: var(--danger-red);
+    color: var(--white);
+}
+
+.btn-group .delete:hover {
+    background-color: #c0392b;
+    transform: translateY(-1px);
+}
+
+/* Logout Button */
+.logout-btn {
+    margin-top: 40px;
+    background: linear-gradient(135deg, var(--hope-navy), #34495e);
+    color: var(--white);
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(44, 62, 80, 0.4);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    body {
+        padding: 20px 15px;
+    }
+    
+    .dashboard {
+        padding: 30px 25px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .form-container {
+        padding: 25px 20px;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group button {
+        flex: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard {
+        padding: 25px 20px;
+    }
+    
+    h1 {
+        font-size: 1.6rem;
+    }
+    
+    form input {
+        padding: 12px 14px;
+    }
+    
+    form button {
+        padding: 14px 20px;
+    }
+}
+
+/* Success/Error States */
+.success-message {
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--success-green);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--success-green);
+    margin-bottom: 20px;
+}
+
+.error-message {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--danger-red);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--danger-red);
+    margin-bottom: 20px;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.event-card {
+    animation: slideInUp 0.4s ease-out;
+}

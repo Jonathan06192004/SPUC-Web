@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Manage Events</title>
+    <link rel="stylesheet" href="../Styles/AdminDashboard.css">
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>Admin Dashboard</h1>
+        <p>Manage Hope Channel Events</p>
+
+        <!-- Add Event Form -->
+        <div class="form-container">
+            <h2>Add / Edit Event</h2>
+            <form id="eventForm">
+                <input type="hidden" id="eventIndex">
+
+                <input type="text" id="day" placeholder="Day (e.g. MON)" required>
+                <input type="text" id="time" placeholder="Time (e.g. 8-10 AM)" required>
+                <input type="text" id="title" placeholder="Event Title" required>
+                <input type="text" id="description" placeholder="Event Description" required>
+
+                <button type="submit">Save Event</button>
+            </form>
+        </div>
+
+        <!-- Event List -->
+        <div class="event-list">
+            <h2>All Events</h2>
+            <div id="eventsContainer"></div>
+        </div>
+
+        <button class="logout-btn" onclick="location.href='../index.html'">Back to Home</button>
+    </div>
+
+<script>
+    const form = document.getElementById("eventForm");
+    const eventsContainer = document.getElementById("eventsContainer");
+
+    let events = JSON.parse(localStorage.getItem("events")) || [];
+
+    function renderEvents() {
+        eventsContainer.innerHTML = "";
+
+        events.forEach((event, index) => {
+            eventsContainer.innerHTML += `
+                <div class="event-card">
+                    <strong>${event.day} | ${event.time}</strong>
+                    <h3>${event.title}</h3>
+                    <p>${event.description}</p>
+                    <div class="btn-group">
+                        <button onclick="editEvent(${index})">Edit</button>
+                        <button onclick="deleteEvent(${index})" class="delete">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        localStorage.setItem("events", JSON.stringify(events));
+    }
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const index = document.getElementById("eventIndex").value;
+
+        const newEvent = {
+            day: document.getElementById("day").value,
+            time: document.getElementById("time").value,
+            title: document.getElementById("title").value,
+            description: document.getElementById("description").value
+        };
+
+        if (index === "") {
+            events.push(newEvent);
+        } else {
+            events[index] = newEvent;
+        }
+
+        form.reset();
+        document.getElementById("eventIndex").value = "";
+        renderEvents();
+    });
+
+    function editEvent(index) {
+        const event = events[index];
+
+        document.getElementById("day").value = event.day;
+        document.getElementById("time").value = event.time;
+        document.getElementById("title").value = event.title;
+        document.getElementById("description").value = event.description;
+        document.getElementById("eventIndex").value = index;
+    }
+
+    function deleteEvent(index) {
+        if (confirm("Are you sure you want to delete this event?")) {
+            events.splice(index, 1);
+            renderEvents();
+        }
+    }
+
+    renderEvents();
+</script>
+
+</body>
+</html>
