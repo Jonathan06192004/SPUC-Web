@@ -2,57 +2,323 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Manage Events</title>
     <link rel="stylesheet" href="../Styles/AdminDashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="dashboard">
-        <h1>Admin Dashboard</h1>
-        <p>Manage Hope Channel Events</p>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p>Hope Channel Events Manager</p>
+                </div>
+            </div>
+            <div class="user-menu">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <button class="menu-item" onclick="location.href='AdminProfile.html'">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Profile</span>
+                    </button>
+                    <button class="menu-item" id="darkModeToggle">
+                        <i class="fas fa-moon"></i>
+                        <span>Dark Mode</span>
+                    </button>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
+    <div class="dashboard">
         <!-- Add Event Form -->
         <div class="form-container">
-            <h2>Add / Edit Event</h2>
+            <h2><i class="fas fa-calendar-plus"></i> Add / Edit Event</h2>
             <form id="eventForm">
                 <input type="hidden" id="eventIndex">
 
-                <input type="text" id="day" placeholder="Day (e.g. MON)" required>
-                <input type="text" id="time" placeholder="Time (e.g. 8-10 AM)" required>
-                <input type="text" id="title" placeholder="Event Title" required>
-                <input type="text" id="description" placeholder="Event Description" required>
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button type="button" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="monthYear"></h3>
+                        <button type="button" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                </div>
 
-                <button type="submit">Save Event</button>
+                <div id="eventDetails" class="event-details" style="display: none;">
+                    <p class="selected-date"><i class="fas fa-calendar-day"></i> <span id="selectedDateText"></span></p>
+                    
+                    <label><i class="fas fa-clock"></i> Select Time</label>
+                    <select id="time" required>
+                        <option value="">Choose time slot</option>
+                        <optgroup label="AM">
+                            <option value="6-8 AM">6-8 AM</option>
+                            <option value="8-10 AM">8-10 AM</option>
+                            <option value="10-12 AM">10-12 AM</option>
+                        </optgroup>
+                        <optgroup label="PM">
+                            <option value="12-2 PM">12-2 PM</option>
+                            <option value="2-4 PM">2-4 PM</option>
+                            <option value="4-6 PM">4-6 PM</option>
+                            <option value="6-8 PM">6-8 PM</option>
+                            <option value="8-10 PM">8-10 PM</option>
+                        </optgroup>
+                        <optgroup label="Custom Time">
+                            <option value="custom">Enter custom time...</option>
+                        </optgroup>
+                    </select>
+                    
+                    <input type="text" id="customTime" placeholder="Enter custom time (e.g., 3-5 PM)" style="display: none;">
+
+                    <label><i class="fas fa-tag"></i> Event Type</label>
+                    <select id="title" required>
+                        <option value="">Choose event type</option>
+                        <option value="10 DAYS OF PRAYER">10 DAYS OF PRAYER</option>
+                        <option value="ADRATV">ADRATV</option>
+                        <option value="DEAR DOKTOR">DEAR DOKTOR</option>
+                        <option value="DUYOG">DUYOG</option>
+                        <option value="HARANA SA KABUNTAGON">HARANA SA KABUNTAGON</option>
+                        <option value="HEAL THY LIFESTYLE">HEAL THY LIFESTYLE</option>
+                        <option value="HOPE GENERATION">HOPE GENERATION</option>
+                        <option value="HOPE WORSHIP">HOPE WORSHIP</option>
+                        <option value="KIDS OF HOPE">KIDS OF HOPE</option>
+                        <option value="LET'S PRAY PILIPINAS">LET'S PRAY PILIPINAS</option>
+                        <option value="MIZPAH LIVE NEWS AND COMMENTARY">MIZPAH LIVE NEWS AND COMMENTARY</option>
+                        <option value="NIGHTLY SERIES">NIGHTLY SERIES</option>
+                        <option value="PANIMBAYA SA KABUNTAGON">PANIMBAYA SA KABUNTAGON</option>
+                        <option value="PARTNERS OF HOPE">PARTNERS OF HOPE</option>
+                        <option value="PRAISE AND PRAY">PRAISE AND PRAY</option>
+                        <option value="PRAISE EXPERIENCE">PRAISE EXPERIENCE</option>
+                        <option value="TAKNA SA PAGTUON">TAKNA SA PAGTUON</option>
+                        <option value="TUBURAN SA PAGLAUM">TUBURAN SA PAGLAUM</option>
+                        <option value="MY JOURNEY WITH GOD">MY JOURNEY WITH GOD</option>
+                        <optgroup label="Custom Event">
+                            <option value="custom">Enter custom event...</option>
+                        </optgroup>
+                    </select>
+                    
+                    <input type="text" id="customTitle" placeholder="Enter custom event name" style="display: none;">
+
+                    <label><i class="fas fa-align-left"></i> Description</label>
+                    <input type="text" id="description" placeholder="Event description (Optional)">
+
+                    <button type="submit">
+                        <i class="fas fa-save"></i>
+                        <span>Save Event</span>
+                    </button>
+                </div>
             </form>
         </div>
 
         <!-- Event List -->
         <div class="event-list">
-            <h2>All Events</h2>
+            <h2><i class="fas fa-list"></i> All Events</h2>
             <div id="eventsContainer"></div>
         </div>
-
-        <button class="logout-btn" onclick="location.href='../index.html'">Back to Home</button>
     </div>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-logo">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div>
+                    <p class="footer-title">Hope Channel</p>
+                    <p class="footer-subtitle">Admin Management System</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <a href="../index.html" class="home-btn">
+                    <i class="fas fa-home"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
+        </div>
+    </footer>
 
 <script>
     const form = document.getElementById("eventForm");
     const eventsContainer = document.getElementById("eventsContainer");
+    const calendarGrid = document.getElementById("calendarGrid");
+    const monthYear = document.getElementById("monthYear");
+    const prevMonth = document.getElementById("prevMonth");
+    const nextMonth = document.getElementById("nextMonth");
+    const eventDetails = document.getElementById("eventDetails");
+    const selectedDateText = document.getElementById("selectedDateText");
+    const timeSelect = document.getElementById("time");
+    const customTimeInput = document.getElementById("customTime");
+    const titleSelect = document.getElementById("title");
+    const customTitleInput = document.getElementById("customTitle");
+    const menuToggle = document.getElementById("menuToggle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const darkModeToggle = document.getElementById("darkModeToggle");
 
     let events = JSON.parse(localStorage.getItem("events")) || [];
+    let currentDate = new Date();
+    let selectedDate = null;
+
+    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // Dark mode toggle
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+    }
+
+    darkModeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+            this.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+        } else {
+            localStorage.setItem('darkMode', 'disabled');
+            this.innerHTML = '<i class="fas fa-moon"></i><span>Dark Mode</span>';
+        }
+    });
+
+    // Dropdown menu toggle
+    let isDropdownOpen = false;
+
+    menuToggle.addEventListener('mouseenter', function() {
+        if (!isDropdownOpen) {
+            dropdownMenu.style.display = 'block';
+        }
+    });
+
+    menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        isDropdownOpen = !isDropdownOpen;
+        dropdownMenu.style.display = isDropdownOpen ? 'block' : 'none';
+    });
+
+    document.querySelector('.user-menu').addEventListener('mouseleave', function() {
+        if (!isDropdownOpen) {
+            dropdownMenu.style.display = 'none';
+        }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+        if (isDropdownOpen) {
+            isDropdownOpen = false;
+            dropdownMenu.style.display = 'none';
+        }
+    });
+
+    // Handle custom time input
+    timeSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customTimeInput.style.display = 'block';
+            customTimeInput.required = true;
+        } else {
+            customTimeInput.style.display = 'none';
+            customTimeInput.required = false;
+            customTimeInput.value = '';
+        }
+    });
+
+    // Handle custom event title input
+    titleSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customTitleInput.style.display = 'block';
+            customTitleInput.required = true;
+        } else {
+            customTitleInput.style.display = 'none';
+            customTitleInput.required = false;
+            customTitleInput.value = '';
+        }
+    });
+
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        monthYear.textContent = `${months[month]} ${year}`;
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        let html = days.map(day => `<div class="day-name">${day}</div>`).join('');
+        
+        for (let i = 0; i < firstDay; i++) {
+            html += '<div class="calendar-day empty"></div>';
+        }
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dateStr = date.toDateString();
+            const isSelected = selectedDate && selectedDate.toDateString() === dateStr;
+            const hasEvent = events.some(e => e.date === dateStr);
+            
+            html += `<div class="calendar-day ${isSelected ? 'selected' : ''} ${hasEvent ? 'has-event' : ''}" data-date="${dateStr}">${day}</div>`;
+        }
+        
+        calendarGrid.innerHTML = html;
+        
+        document.querySelectorAll('.calendar-day:not(.empty)').forEach(day => {
+            day.addEventListener('click', function() {
+                const dateStr = this.dataset.date;
+                selectedDate = new Date(dateStr);
+                selectedDateText.textContent = dateStr;
+                eventDetails.style.display = 'block';
+                renderCalendar();
+            });
+        });
+    }
+
+    prevMonth.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    nextMonth.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+            localStorage.removeItem("isAdminLoggedIn");
+            window.location.href = "LoginAdmin.html";
+        }
+    }
 
     function renderEvents() {
         eventsContainer.innerHTML = "";
 
+        if (events.length === 0) {
+            eventsContainer.innerHTML = '<p class="no-events"><i class="fas fa-calendar-xmark"></i> No events yet. Add your first event above!</p>';
+            return;
+        }
+
         events.forEach((event, index) => {
             eventsContainer.innerHTML += `
                 <div class="event-card">
-                    <strong>${event.day} | ${event.time}</strong>
+                    <div class="event-header">
+                        <strong><i class="fas fa-clock"></i> ${event.day} | ${event.time}</strong>
+                    </div>
                     <h3>${event.title}</h3>
                     <p>${event.description}</p>
                     <div class="btn-group">
-                        <button onclick="editEvent(${index})">Edit</button>
-                        <button onclick="deleteEvent(${index})" class="delete">Delete</button>
+                        <button onclick="editEvent(${index})"><i class="fas fa-edit"></i> Edit</button>
+                        <button onclick="deleteEvent(${index})" class="delete"><i class="fas fa-trash"></i> Delete</button>
                     </div>
                 </div>
             `;
@@ -64,12 +330,18 @@
     form.addEventListener("submit", function(e) {
         e.preventDefault();
 
+        if (!selectedDate) {
+            alert('Please select a date from the calendar');
+            return;
+        }
+
         const index = document.getElementById("eventIndex").value;
 
         const newEvent = {
-            day: document.getElementById("day").value,
-            time: document.getElementById("time").value,
-            title: document.getElementById("title").value,
+            date: selectedDate.toDateString(),
+            day: days[selectedDate.getDay()] + ', ' + selectedDate.toLocaleDateString(),
+            time: timeSelect.value === 'custom' ? customTimeInput.value : timeSelect.value,
+            title: titleSelect.value === 'custom' ? customTitleInput.value : titleSelect.value,
             description: document.getElementById("description").value
         };
 
@@ -81,26 +353,57 @@
 
         form.reset();
         document.getElementById("eventIndex").value = "";
+        selectedDate = null;
+        eventDetails.style.display = 'none';
         renderEvents();
+        renderCalendar();
     });
 
     function editEvent(index) {
         const event = events[index];
 
-        document.getElementById("day").value = event.day;
-        document.getElementById("time").value = event.time;
-        document.getElementById("title").value = event.title;
+        selectedDate = new Date(event.date);
+        selectedDateText.textContent = event.date;
+        
+        // Check if time is in predefined options
+        const timeOptions = Array.from(timeSelect.options).map(opt => opt.value);
+        if (timeOptions.includes(event.time)) {
+            timeSelect.value = event.time;
+        } else {
+            timeSelect.value = 'custom';
+            customTimeInput.style.display = 'block';
+            customTimeInput.required = true;
+            customTimeInput.value = event.time;
+        }
+        
+        // Check if title is in predefined options
+        const titleOptions = Array.from(titleSelect.options).map(opt => opt.value);
+        if (titleOptions.includes(event.title)) {
+            titleSelect.value = event.title;
+        } else {
+            titleSelect.value = 'custom';
+            customTitleInput.style.display = 'block';
+            customTitleInput.required = true;
+            customTitleInput.value = event.title;
+        }
+        
         document.getElementById("description").value = event.description;
         document.getElementById("eventIndex").value = index;
+        eventDetails.style.display = 'block';
+        
+        renderCalendar();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function deleteEvent(index) {
         if (confirm("Are you sure you want to delete this event?")) {
             events.splice(index, 1);
             renderEvents();
+            renderCalendar();
         }
     }
 
+    renderCalendar();
     renderEvents();
 </script>
 

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="../Styles/AdminProfile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1>Admin Profile</h1>
+                    <p>Manage Your Account</p>
+                </div>
+            </div>
+            <div class="user-menu">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <button class="menu-item" onclick="location.href='AdminDashboard.html'">
+                        <i class="fas fa-dashboard"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="menu-item" id="darkModeToggle">
+                        <i class="fas fa-moon"></i>
+                        <span>Dark Mode</span>
+                    </button>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="profile-container">
+        <!-- Profile Info Card -->
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h2>Administrator</h2>
+            <p class="profile-email">admin@hopechannel.com</p>
+        </div>
+
+        <!-- Change Username -->
+        <div class="settings-card">
+            <h3><i class="fas fa-user-edit"></i> Change Username</h3>
+            <form id="usernameForm">
+                <label>Current Username</label>
+                <input type="text" id="currentUsername" value="admin" disabled>
+                
+                <label>New Username</label>
+                <input type="text" id="newUsername" placeholder="Enter new username" required>
+                
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    <span>Update Username</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Change Password -->
+        <div class="settings-card">
+            <h3><i class="fas fa-lock"></i> Change Password</h3>
+            <form id="passwordForm">
+                <label>Current Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="currentPassword" placeholder="Enter current password" required>
+                    <i class="fas fa-eye toggle-password"></i>
+                </div>
+                
+                <label>New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="newPassword" placeholder="Enter new password" required>
+                    <i class="fas fa-eye toggle-password"></i>
+                </div>
+                
+                <label>Confirm New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+                    <i class="fas fa-eye toggle-password"></i>
+                </div>
+                
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    <span>Update Password</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-logo">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div>
+                    <p class="footer-title">Hope Channel</p>
+                    <p class="footer-subtitle">Admin Management System</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <a href="../index.html" class="home-btn">
+                    <i class="fas fa-home"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+<script>
+    const menuToggle = document.getElementById("menuToggle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const darkModeToggle = document.getElementById("darkModeToggle");
+
+    // Dark mode toggle
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+    }
+
+    darkModeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+            this.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+        } else {
+            localStorage.setItem('darkMode', 'disabled');
+            this.innerHTML = '<i class="fas fa-moon"></i><span>Dark Mode</span>';
+        }
+    });
+
+    // Dropdown menu toggle
+    let isDropdownOpen = false;
+
+    menuToggle.addEventListener('mouseenter', function() {
+        if (!isDropdownOpen) {
+            dropdownMenu.style.display = 'block';
+        }
+    });
+
+    menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        isDropdownOpen = !isDropdownOpen;
+        dropdownMenu.style.display = isDropdownOpen ? 'block' : 'none';
+    });
+
+    document.querySelector('.user-menu').addEventListener('mouseleave', function() {
+        if (!isDropdownOpen) {
+            dropdownMenu.style.display = 'none';
+        }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+        if (isDropdownOpen) {
+            isDropdownOpen = false;
+            dropdownMenu.style.display = 'none';
+        }
+    });
+
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(icon => {
+        icon.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    });
+
+    function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+            localStorage.removeItem("isAdminLoggedIn");
+            window.location.href = "LoginAdmin.html";
+        }
+    }
+
+    // Username form submission
+    document.getElementById('usernameForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newUsername = document.getElementById('newUsername').value;
+        alert('Username updated to: ' + newUsername);
+        document.getElementById('currentUsername').value = newUsername;
+        this.reset();
+    });
+
+    // Password form submission
+    document.getElementById('passwordForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (newPassword !== confirmPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
+        
+        alert('Password updated successfully!');
+        this.reset();
+    });
+</script>
+
+</body>
+</html>
