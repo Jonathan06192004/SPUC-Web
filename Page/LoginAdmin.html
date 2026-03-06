@@ -1,86 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <link rel="stylesheet" href="../Styles/LoginAdmin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
+
+<link rel="stylesheet" href="../Styles/LoginAdmin.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
+
 <body>
 
-    <div class="login-container">
-        <div class="logo-section">
-            <div class="logo-circle">
-                <i class="fas fa-shield-halved"></i>
-            </div>
-            <h2>Admin Portal</h2>
-            <p class="subtitle">Secure Access Dashboard</p>
+<div class="login-container">
+
+    <div class="logo-section">
+        <div class="logo-circle">
+            <i class="fas fa-shield-halved"></i>
         </div>
 
-        <form id="loginForm">
-            <div class="input-group">
-                <label><i class="fas fa-user"></i> Username</label>
-                <input type="text" id="username" placeholder="Enter your username" required>
-            </div>
-
-            <div class="input-group">
-                <label><i class="fas fa-lock"></i> Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                    <i class="fas fa-eye toggle-password" id="togglePassword"></i>
-                </div>
-            </div>
-
-            <button type="submit" class="login-btn">
-                <span>Sign In</span>
-                <i class="fas fa-arrow-right"></i>
-            </button>
-        </form>
-
+        <h2>Admin Portal</h2>
+        <p class="subtitle">Secure Access Dashboard</p>
     </div>
 
-<script>
-    const form = document.getElementById("loginForm");
-    const togglePassword = document.getElementById("togglePassword");
-    const passwordInput = document.getElementById("password");
+    <form id="loginForm">
 
-    // Toggle password visibility
-    togglePassword.addEventListener("click", function() {
-        const type = passwordInput.type === "password" ? "text" : "password";
-        passwordInput.type = type;
-        this.classList.toggle("fa-eye");
-        this.classList.toggle("fa-eye-slash");
+        <div class="input-group">
+            <label><i class="fas fa-user"></i> Email</label>
+            <input type="email" id="email" placeholder="Enter admin email" required>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-lock"></i> Password</label>
+
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="Enter your password" required>
+                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+            </div>
+
+        </div>
+
+        <div id="error" style="display:none;color:red;margin-bottom:10px;font-size:14px;"></div>
+
+        <button type="submit" class="login-btn">
+            <span>Sign In</span>
+            <i class="fas fa-arrow-right"></i>
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+/* YOUR FIREBASE CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyDzSCJ8XellJRvOSBZ7cTCA2OcmFh8jSrs",
+  authDomain: "spuc-events-web.firebaseapp.com",
+  projectId: "spuc-events-web",
+  storageBucket: "spuc-events-web.firebasestorage.app",
+  messagingSenderId: "989356465487",
+  appId: "1:989356465487:web:428b119629a939e725793a",
+  measurementId: "G-QE1HPE63EH"
+};
+
+
+/* INITIALIZE FIREBASE */
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+
+
+/* PASSWORD SHOW/HIDE */
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("password");
+
+togglePassword.addEventListener("click", function(){
+
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+
+    this.classList.toggle("fa-eye");
+    this.classList.toggle("fa-eye-slash");
+
+});
+
+
+/* LOGIN SYSTEM */
+const form = document.getElementById("loginForm");
+
+form.addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const errorMsg = document.getElementById("error");
+    const loginBtn = document.querySelector(".login-btn");
+
+    loginBtn.innerHTML = "Signing in...";
+    loginBtn.disabled = true;
+
+    signInWithEmailAndPassword(auth, email, password)
+
+    .then((userCredential) => {
+
+        const user = userCredential.user;
+
+        localStorage.setItem("isAdminLoggedIn", "true");
+
+        window.location.href = "AdminDashboard.html";
+
+    })
+
+    .catch((error) => {
+
+        errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + error.message;
+        errorMsg.style.display = "block";
+
+        loginBtn.innerHTML = '<span>Sign In</span><i class="fas fa-arrow-right"></i>';
+        loginBtn.disabled = false;
+
     });
 
-    form.addEventListener("submit", function(e) {
-        e.preventDefault();
+});
 
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-        const loginBtn = document.querySelector(".login-btn");
-
-        // Add loading state
-        loginBtn.classList.add("loading");
-        loginBtn.innerHTML = '<span>Signing in...</span>';
-
-        // Sample admin credentials
-        const adminUser = "admin";
-        const adminPass = "1234";
-
-        setTimeout(() => {
-            if (username === adminUser && password === adminPass) {
-                localStorage.setItem("isAdminLoggedIn", "true");
-                window.location.href = "AdminDashboard.html";
-            } else {
-                const errorMsg = document.getElementById("error");
-                errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid username or password.';
-                errorMsg.style.display = "block";
-                loginBtn.classList.remove("loading");
-                loginBtn.innerHTML = '<span>Sign In</span><i class="fas fa-arrow-right"></i>';
-            }
-        }, 800);
-    });
 </script>
 
 </body>
