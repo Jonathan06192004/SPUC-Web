@@ -1,14 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hope Channel South Philippines - Broadcast Schedule</title>
     <link rel="stylesheet" href="Styles/index.css">
 </head>
+
 <body>
 
-    <header class="top-branding"></header>
+    <header class="top-branding">
+        <div class="header-left">
+            <img src="Assets/HCLogo.png" alt="Hope Channel Logo" class="hc-logo">
+            <div class="header-text">
+                <p class="welcome-text">WELCOME TO</p>
+                <h1 class="channel-name">Hope Channel</h1>
+                <p class="subtitle-text">SOUTHWESTERN PHILIPPINE UNION CONFERENCE</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="rectangle-yellow"></div>
+            <div class="rectangle-orange"></div>
+            <img src="Assets/SWPUC Territory.png" alt="SWPUC Territory" class="territory-info">
+            <img src="Assets/map.png" alt="Territory Map" class="territory-map">
+        </div>
+        <div class="header-bottom"></div>
+    </header>
+
 
     <main class="main-container">
         <div class="schedule-header">
@@ -48,39 +67,35 @@
         </div>
     </main>
 
-    <footer class="main-footer">
-        <p>&copy; 2026 Hope Channel South Philippines • Seventh-day Adventist Church</p>
-    </footer>
-
     <script>
         function generateCalendar() {
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth();
             const today = now.getDate();
-            
+
             const monthNames = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"];
-            
+
             document.getElementById('calendarHeader').textContent = `${monthNames[month]} ${year}`;
-            
+
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
+
             const grid = document.getElementById('calendarGrid');
             grid.innerHTML = '';
-            
+
             ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(day => {
                 const label = document.createElement('div');
                 label.className = 'calendar-day-label';
                 label.textContent = day;
                 grid.appendChild(label);
             });
-            
+
             for (let i = 0; i < firstDay; i++) {
                 grid.appendChild(document.createElement('div'));
             }
-            
+
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayEl = document.createElement('div');
                 dayEl.className = 'calendar-day';
@@ -89,9 +104,10 @@
                 grid.appendChild(dayEl);
             }
         }
-        
+
         generateCalendar();
     </script>
 
 </body>
+
 </html>
