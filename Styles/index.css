@@ -195,6 +195,7 @@ body > * {
     display: flex;
     flex-direction: column;
     padding: 2vh 4vw;
+    margin-top: -6vh;
 }
 
 /* Date and Title Styling */
@@ -210,10 +211,10 @@ body > * {
     margin-bottom: 0.5vh;
     font-weight: 500;
     letter-spacing: clamp(2px, 0.3vw, 6px);
-    background: #1e3a5f;
+    background: #12336f;
     display: inline-block;
     padding: clamp(6px, 0.8vh, 12px) clamp(20px, 2.5vw, 50px);
-    border-radius: clamp(15px, 2vw, 30px);
+    border-radius: clamp(10px, 1vw, 20px);
 }
 
 .date-display {
@@ -250,7 +251,7 @@ body > * {
 .schedule-row {
     background-color: #ffd503;
     min-height: clamp(60px, 9vh, 120px);
-    border-radius: clamp(25px, 3vw, 60px);
+    border-radius: clamp(25px, 1vw, 60px);
     display: flex;
     align-items: center;
     padding: clamp(8px, 1.5vh, 20px) clamp(15px, 2vw, 40px);
@@ -282,7 +283,8 @@ body > * {
     flex-direction: column;
     width: clamp(250px, 25vw, 500px);
     flex-shrink: 0;
-    gap: clamp(15px, 2vh, 30px);
+    gap: clamp(35px, 70px, 80px);
+    margin-top: 13.5vh;
 }
 
 .image-box {
