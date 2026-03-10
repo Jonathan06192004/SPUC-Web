@@ -1,90 +1,285 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hope Channel South Philippines - Broadcast Schedule</title>
-    <link rel="stylesheet" href="Styles/index.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hope Channel South Philippines - Broadcast Schedule</title>
+<link rel="stylesheet" href="Styles/index.css">
 </head>
 
 <body>
 
-    <header class="top-branding">
-        <div class="header-left">
-            <img src="Assets/HCLogo.png" alt="Hope Channel Logo" class="hc-logo">
-            <div class="header-text">
-                <p class="welcome-text">WELCOME TO</p>
-                <h1 class="channel-name">Hope Channel</h1>
-                <p class="subtitle-text">SOUTH PHILIPPINES</p>
-            </div>
-        </div>
-        <div class="header-right">
-            <div class="rectangle-yellow"></div>
-            <img src="Assets/SWPUC Territory.png" alt="SWPUC Territory" class="territory-info">
-            <img src="Assets/map.png" alt="Territory Map" class="territory-map">
-        </div>
-        <div class="header-bottom"></div>
-    </header>
+<header class="top-branding">
+<div class="header-left">
+<img src="Assets/HCLogo.png" alt="Hope Channel Logo" class="hc-logo">
 
-    <div class="time-display-header">
-        <span class="time-label-header">TIME:</span>
-        <span class="current-time-header" id="currentTime"></span>
-    </div>
+<div class="header-text">
+<p class="welcome-text">WELCOME TO</p>
+<h1 class="channel-name">Hope Channel</h1>
+<p class="subtitle-text">SOUTH PHILIPPINES</p>
+</div>
+</div>
 
-    <main class="main-container">
+<div class="header-right">
+<div class="rectangle-yellow"></div>
+<img src="Assets/SWPUC Territory.png" class="territory-info">
+<img src="Assets/map.png" class="territory-map">
+</div>
 
-        <div class="content-layout">
-            <section class="list-container">
-                 <div class="schedule-header">
-                    <p class="subtitle">TODAY'S SCHEDULE</p>
-                    <h1 class="date-display"><span class="day-highlight">MONDAY</span> MARCH 9, 2026</h1>
-                </div>
-                <div class="schedule-row">
-                    <span class="time-range">8:00-8:30am</span>
-                    <span class="program-name">KIDS OF HOPE</span>
-                </div>
-                <div class="schedule-row">
-                    <span class="time-range">8:30-9:00am</span>
-                    <span class="program-name">TAKNA SA PAGTUON</span>
-                </div>
-                <div class="schedule-row">
-                    <span class="time-range">9:00-9:30am</span>
-                    <span class="program-name">HOPE WORSHIP</span>
-                </div>
-                <div class="schedule-row">
-                    <span class="time-range">9:30-10:00am</span>
-                    <span class="program-name">PRAISE EXPERIENCE</span>
-                </div>
-            </section>
+<div class="header-bottom"></div>
+</header>
 
-            <aside class="preview-area">
-                <div class="image-box">
-                    <img src="Assets/Preview.png" alt="Live Preview" id="imageSlider">
-                </div>
-                <div class="video-box">
-                    <iframe id="youtubeVideo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-            </aside>
-        </div>
-    </main>
+<div class="time-display-header">
+<span class="time-label-header">TIME:</span>
+<span class="current-time-header" id="currentTime"></span>
+</div>
 
-    <script>
-        function updateTime() {
-            const now = new Date();
-            const hours = now.getHours();
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            const displayHours = hours % 12 || 12;
-            
-            document.getElementById('currentTime').textContent = `${displayHours}:${minutes}:${seconds} ${ampm}`;
+<main class="main-container">
+
+<div class="content-layout">
+
+<section class="list-container">
+
+<div class="schedule-header">
+<p class="subtitle">TODAY'S SCHEDULE</p>
+<h1 class="date-display" id="todayDate">
+<span class="day-highlight">MONDAY</span> MARCH 9, 2026
+</h1>
+</div>
+
+</section>
+
+<aside class="preview-area">
+
+<!-- LIVE CALENDAR -->
+
+<div class="image-box">
+<div id="liveCalendar"></div>
+</div>
+
+<!-- VIDEO -->
+
+<div class="video-box">
+<iframe 
+id="youtubeVideo"
+src="https://www.youtube.com/embed/KJe9A5TmV_k?autoplay=1&mute=1&loop=1&playlist=KJe9A5TmV_k"
+frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen>
+</iframe>
+</div>
+
+</aside>
+
+</div>
+</main>
+
+<script>
+
+/* CLOCK */
+
+function updateTime(){
+const now = new Date();
+
+const hours = now.getHours();
+const minutes = now.getMinutes().toString().padStart(2,'0');
+const seconds = now.getSeconds().toString().padStart(2,'0');
+
+const ampm = hours >= 12 ? 'PM' : 'AM';
+const displayHours = hours % 12 || 12;
+
+document.getElementById('currentTime').textContent =
+`${displayHours}:${minutes}:${seconds} ${ampm}`;
+}
+
+updateTime();
+setInterval(updateTime,1000);
+
+
+/* TODAY HEADER DATE */
+
+const today = new Date();
+
+const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+const months = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+
+const dayName = days[today.getDay()];
+const monthName = months[today.getMonth()];
+const dateNumber = today.getDate();
+const year = today.getFullYear();
+
+document.getElementById("todayDate").innerHTML =
+`<span class="day-highlight">${dayName}</span> ${monthName} ${dateNumber}, ${year}`;
+
+
+/* LIVE CALENDAR */
+
+/* IMPROVED LIVE CALENDAR */
+function generateCalendar() {
+    const calendar = document.getElementById("liveCalendar");
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
+
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    let html = `
+        <h2 style="text-align:center; color:#1e3a5f; margin-bottom:10px;">
+            ${monthNames[month]} ${year}
+        </h2>
+        <table class="calendar-table">
+            <thead>
+                <tr>
+                    <th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>`;
+
+    // Fill empty cells for days before the 1st
+    for (let i = 0; i < firstDay; i++) {
+        html += "<td></td>";
+    }
+
+    // Fill days
+    for (let day = 1; day <= lastDate; day++) {
+        if ((firstDay + day - 1) % 7 === 0 && day !== 1) {
+            html += "</tr><tr>";
         }
 
-        updateTime();
-        setInterval(updateTime, 1000);
-    </script>
+        const isToday = (day === now.getDate());
+        html += `<td>
+                    <div class="day-cell ${isToday ? 'today-highlight' : ''}">
+                        ${day}
+                    </div>
+                 </td>`;
+    }
+
+    html += "</tr></tbody></table>";
+    calendar.innerHTML = html;
+}
+
+generateCalendar();
+
+</script>
+
+<!-- FIREBASE EVENTS -->
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyDzSCJ8XellJRvOSBZ7cTCA2OcmFh8jSrs",
+authDomain: "spuc-events-web.firebaseapp.com",
+projectId: "spuc-events-web",
+storageBucket: "spuc-events-web.firebasestorage.app",
+messagingSenderId: "989356465487",
+appId: "1:989356465487:web:428b119629a939e725793a",
+measurementId: "G-QE1HPE63EH"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+/* convert time to minutes */
+
+function convertToMinutes(timeString) {
+    // Remove "PM"/"AM" and any extra spaces
+    let cleanTime = timeString.replace(/(AM|PM)/i, '').trim();
+    let [h, m] = cleanTime.split(':');
+    
+    h = parseInt(h);
+    m = m ? parseInt(m) : 0; // Handle if :00 is missing
+
+    // Convert to 24-hour format
+    if (timeString.toUpperCase().includes('PM') && h !== 12) h += 12;
+    if (timeString.toUpperCase().includes('AM') && h === 12) h = 0;
+
+    return h * 60 + m;
+}
+
+
+async function loadTodayEvents() {
+    const container = document.querySelector(".list-container");
+    
+    // Maintain the header so it doesn't get cleared
+    const headerHTML = `
+        <div class="schedule-header">
+            <p class="subtitle">TODAY'S SCHEDULE</p>
+            <h1 class="date-display" id="todayDate">
+                <span class="day-highlight">${document.querySelector('.day-highlight').textContent}</span> 
+                ${document.getElementById("todayDate").innerText.split(' ').slice(1).join(' ')}
+            </h1>
+        </div>`;
+    container.innerHTML = headerHTML;
+    
+    const today = new Date().toDateString();
+    const snapshot = await getDocs(collection(db, "events"));
+    
+    // 1. Fetch events and put them in an array
+    let eventsArray = [];
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        if (new Date(data.date).toDateString() === today) {
+            eventsArray.push(data);
+        }
+    });
+
+    // 2. Sort the array by start time
+    eventsArray.sort((a, b) => {
+        const startA = convertToMinutes(a.time.split('-')[0].trim());
+        const startB = convertToMinutes(b.time.split('-')[0].trim());
+        return startA - startB;
+    });
+
+    // 3. Render the sorted events
+    eventsArray.forEach(data => {
+        let [startStr, endStr] = data.time.split('-');
+        if (!startStr.includes('PM') && !startStr.includes('AM')) {
+            startStr += endStr.match(/(AM|PM)/i)[0];
+        }
+
+        const startMinutes = convertToMinutes(startStr);
+        const endMinutes = convertToMinutes(endStr);
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+        let badge = "";
+        if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
+            badge = `<div class="ongoing-badge">ON-GOING</div>`;
+        }
+
+        const row = document.createElement("div");
+        row.className = "schedule-row";
+        row.innerHTML = `
+            <span class="time-range">${data.time}</span>
+            <span class="program-name">${data.title}</span>
+            ${badge}
+        `;
+        container.appendChild(row);
+    });
+}
+
+loadTodayEvents();
+
+/* auto refresh every minute */
+
+setInterval(()=>{
+location.reload();
+},60000);
+
+</script>
 
 </body>
-
 </html>

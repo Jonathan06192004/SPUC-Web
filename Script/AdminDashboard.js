@@ -12,7 +12,6 @@ const firebaseConfig = {
   measurementId: "G-QE1HPE63EH"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -38,16 +37,19 @@ let editID = null;
 const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-// LOAD EVENTS FROM FIREBASE
+// HELPER: Ensures time is stored in DB with :00 format (e.g., "4:00 - 6:00 PM")
+function formatTimeForDB(timeStr) {
+    // Replaces numbers like "4" or "6" with "4:00" or "6:00"
+    return timeStr.replace(/(\d+)(?::\d+)?(?=\s*(?:-|–)\s*(\d+)(?::\d+)?)/g, '$1:00')
+                  .replace(/(\d+)(?::\d+)?(?=\s*[AP]M)/g, '$1:00');
+}
+
+// LOAD EVENTS
 async function loadEvents(){
     events = [];
     const querySnapshot = await getDocs(collection(db,"events"));
     querySnapshot.forEach((docSnap)=>{
-        const data = docSnap.data();
-        events.push({
-            id: docSnap.id,
-            ...data
-        });
+        events.push({ id: docSnap.id, ...docSnap.data() });
     });
     renderEvents();
     renderCalendar();
@@ -61,9 +63,7 @@ function renderCalendar(){
     const firstDay = new Date(year,month,1).getDay();
     const daysInMonth = new Date(year,month+1,0).getDate();
     let html = days.map(d=>`<div class="day-name">${d}</div>`).join("");
-    for(let i=0;i<firstDay;i++){
-        html += `<div class="calendar-day empty"></div>`;
-    }
+    for(let i=0;i<firstDay;i++){ html += `<div class="calendar-day empty"></div>`; }
     for(let day=1;day<=daysInMonth;day++){
         const date = new Date(year,month,day);
         const dateStr = date.toDateString();
@@ -80,20 +80,21 @@ function renderCalendar(){
     });
 }
 
-// SAVE EVENT
+// SAVE EVENT (Updated with Formatting)
 form.addEventListener("submit", async(e)=>{
     e.preventDefault();
-    if(!selectedDate){
-        alert("Select a date");
-        return;
-    }
+    if(!selectedDate){ alert("Select a date"); return; }
+    
+    const rawTime = timeSelect.value === "custom" ? customTimeInput.value : timeSelect.value;
+    
     const newEvent = {
         date: selectedDate.toDateString(),
         day: days[selectedDate.getDay()] + ', ' + selectedDate.toLocaleDateString(),
-        time: timeSelect.value === "custom" ? customTimeInput.value : timeSelect.value,
+        time: formatTimeForDB(rawTime), // Automatically formats before saving
         title: titleSelect.value === "custom" ? customTitleInput.value : titleSelect.value,
         description: document.getElementById("description").value
     };
+    
     if(editID){
         await updateDoc(doc(db,"events",editID),newEvent);
         editID = null;
@@ -109,16 +110,11 @@ form.addEventListener("submit", async(e)=>{
 // RENDER EVENTS
 function renderEvents(){
     eventsContainer.innerHTML="";
-    if(events.length===0){
-        eventsContainer.innerHTML=`<p>No events yet</p>`;
-        return;
-    }
+    if(events.length===0){ eventsContainer.innerHTML=`<p>No events yet</p>`; return; }
     events.forEach((event)=>{
         eventsContainer.innerHTML += `
         <div class="event-card">
-            <div class="event-header">
-                <strong>${event.day} | ${event.time}</strong>
-            </div>
+            <div class="event-header"><strong>${event.day} | ${event.time}</strong></div>
             <h3>${event.title}</h3>
             <p>${event.description || ""}</p>
             <div class="btn-group">
@@ -129,6 +125,9 @@ function renderEvents(){
         `;
     });
 }
+
+// ... (Rest of your existing functions: editEvent, deleteEvent, navigation, UI toggles remain unchanged) ...
+// Ensure you keep your existing bottom functions for Logout, DarkMode, etc.
 
 // EDIT EVENT
 window.editEvent = function(id){
