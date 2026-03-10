@@ -1,6 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDzSCJ8XellJRvOSBZ7cTCA2OcmFh8jSrs",
@@ -13,10 +12,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Password show/hide
+
+// SHOW / HIDE PASSWORD
 const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
 
@@ -27,29 +26,63 @@ togglePassword.addEventListener("click", function(){
     this.classList.toggle("fa-eye-slash");
 });
 
-// Login system
+
+// LOGIN SYSTEM
 const form = document.getElementById("loginForm");
 
-form.addEventListener("submit", function(e){
+form.addEventListener("submit", async function(e){
+
     e.preventDefault();
+
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
+
     const errorMsg = document.getElementById("error");
     const loginBtn = document.querySelector(".login-btn");
 
     loginBtn.innerHTML = "Signing in...";
     loginBtn.disabled = true;
 
-    signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        const user = userCredential.user;
-        localStorage.setItem("isAdminLoggedIn", "true");
-        window.location.href = "AdminDashboard.html";
-    })
-    .catch((error) => {
-        errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + error.message;
+    try {
+
+        const docRef = doc(db, "admin", "adminCredentials");
+        const docSnap = await getDoc(docRef);
+
+        if(docSnap.exists()){
+
+            const data = docSnap.data();
+
+            if(email === data.username && password === data.password){
+
+                localStorage.setItem("isAdminLoggedIn", "true");
+
+                window.location.href = "AdminDashboard.html";
+
+            }else{
+
+                errorMsg.innerHTML = "Invalid username or password";
+                errorMsg.style.display = "block";
+
+                loginBtn.innerHTML = '<span>Sign In</span><i class="fas fa-arrow-right"></i>';
+                loginBtn.disabled = false;
+
+            }
+
+        }else{
+
+            errorMsg.innerHTML = "Admin account not found";
+            errorMsg.style.display = "block";
+
+        }
+
+    } catch(error){
+
+        errorMsg.innerHTML = error.message;
         errorMsg.style.display = "block";
+
         loginBtn.innerHTML = '<span>Sign In</span><i class="fas fa-arrow-right"></i>';
         loginBtn.disabled = false;
-    });
+
+    }
+
 });
