@@ -27,84 +27,63 @@
         <div class="header-bottom"></div>
     </header>
 
+    <div class="time-display-header">
+        <span class="time-label-header">TIME:</span>
+        <span class="current-time-header" id="currentTime"></span>
+    </div>
+
 
     <main class="main-container">
-        <div class="schedule-header">
-            <p class="subtitle">Today's Morning Schedule</p>
-            <h1 class="date-display">MARCH 9, 2026 - MONDAY</h1>
-        </div>
 
         <div class="content-layout">
             <section class="list-container">
-                <div class="schedule-row active">
-                    <span class="time-range">8:00am - 9:30am</span>
+                 <div class="schedule-header">
+                    <p class="subtitle">TODAY'S SCHEDULE</p>
+                    <h1 class="date-display"><span class="day-highlight">MONDAY</span> MARCH 9, 2026</h1>
+                </div>
+                <div class="schedule-row">
+                    <span class="time-range">8:00-8:30am</span>
                     <span class="program-name">KIDS OF HOPE</span>
                 </div>
                 <div class="schedule-row">
-                    <span class="time-range">8:00am - 9:30am</span>
-                    <span class="program-name"></span>
+                    <span class="time-range">8:30-9:00am</span>
+                    <span class="program-name">TAKNA SA PAGTUON</span>
                 </div>
                 <div class="schedule-row">
-                    <span class="time-range">8:00am - 9:30am</span>
-                    <span class="program-name"></span>
+                    <span class="time-range">9:00-9:30am</span>
+                    <span class="program-name">HOPE WORSHIP</span>
                 </div>
                 <div class="schedule-row">
-                    <span class="time-range">8:00am - 9:30am</span>
-                    <span class="program-name"></span>
+                    <span class="time-range">9:30-10:00am</span>
+                    <span class="program-name">PRAISE EXPERIENCE</span>
                 </div>
             </section>
 
             <aside class="preview-area">
-                <div class="calendar-box">
-                    <div class="calendar-header" id="calendarHeader"></div>
-                    <div class="calendar-grid" id="calendarGrid"></div>
-                </div>
                 <div class="image-box">
-                    <img src="Assets/Preview.png" alt="Live Preview">
+                    <img src="Assets/Preview.png" alt="Live Preview" id="imageSlider">
+                </div>
+                <div class="video-box">
+                    <iframe id="youtubeVideo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
             </aside>
         </div>
     </main>
 
     <script>
-        function generateCalendar() {
+        function updateTime() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            const today = now.getDate();
-
-            const monthNames = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"];
-
-            document.getElementById('calendarHeader').textContent = `${monthNames[month]} ${year}`;
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            const grid = document.getElementById('calendarGrid');
-            grid.innerHTML = '';
-
-            ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(day => {
-                const label = document.createElement('div');
-                label.className = 'calendar-day-label';
-                label.textContent = day;
-                grid.appendChild(label);
-            });
-
-            for (let i = 0; i < firstDay; i++) {
-                grid.appendChild(document.createElement('div'));
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayEl = document.createElement('div');
-                dayEl.className = 'calendar-day';
-                if (day === today) dayEl.classList.add('today');
-                dayEl.textContent = day;
-                grid.appendChild(dayEl);
-            }
+            const hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            
+            document.getElementById('currentTime').textContent = `${displayHours}:${minutes}:${seconds} ${ampm}`;
         }
 
-        generateCalendar();
+        updateTime();
+        setInterval(updateTime, 1000);
     </script>
 
 </body>

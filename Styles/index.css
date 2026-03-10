@@ -106,9 +106,9 @@ body > * {
 
 .header-right {
     background: url('../Assets/header-right.png') no-repeat center center;
-    left: -26px;
+    left: -31px;
     background-size: 100% 100%;
-    width: 40%;
+    width: 42%;
     display: flex;
     align-items: center;
     padding: 2vh clamp(20px, 2vw, 40px) 2vh clamp(80px, 7vw, 130px);
@@ -119,13 +119,13 @@ body > * {
 
 .rectangle-yellow {
     position: absolute;
-    left: clamp(7px, -3vw, -30px);
+    left: clamp(11px, -3vw, -30px);
     top: clamp(42px, 4vh, 70px);
     width: clamp(60px, 6vw, 120px);
     height: 76%;
     background: url(../Assets/rectangle-yellow.png) no-repeat center center;
-    background-size: 100% 106%;
-    z-index: 3;
+    background-size: 100% 102%;
+    z-index: 2;
 }
 
 .adventist-logo {
@@ -158,6 +158,37 @@ body > * {
     z-index: 2;
 }
 
+/* --- TIME DISPLAY HEADER --- */
+.time-display-header {
+    background: #10316c;
+    padding: clamp(8px, 1.2vh, 20px) clamp(20px, 3vw, 60px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(15px, 2vw, 40px);
+    position: relative;
+    z-index: 1;
+    width: 34%;
+    margin-left: auto;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 5% 100%);
+    /* border: clamp(2px, 0.3vw, 5px) solid var(--hope-orange); */
+    border-top: none;
+}
+
+.time-label-header {
+    font-size: clamp(18px, 40px, 48px);
+    font-weight: 600;
+    color: #f9f8fa;
+    letter-spacing: clamp(2px, 0.3vw, 8px);
+}
+
+.current-time-header {
+    font-size: clamp(22px, 75px, 40px);
+    font-weight: 400;
+    color: #f9f8fa;
+    font-family: 'Courier New', monospace;
+}
+
 /* --- MAIN CONTAINER --- */
 .main-container {
     flex: 1;
@@ -168,15 +199,21 @@ body > * {
 
 /* Date and Title Styling */
 .schedule-header {
-    border-left: clamp(4px, 0.5vw, 10px) solid var(--hope-orange);
     padding-left: clamp(10px, 1.2vw, 25px);
     margin-bottom: clamp(15px, 3vh, 40px);
+    text-align: center;
 }
 
 .subtitle {
-    font-size: clamp(16px, 1.9vw, 40px);
-    color: #333;
+    font-size: clamp(14px, 1.5vw, 32px);
+    color: white;
     margin-bottom: 0.5vh;
+    font-weight: 500;
+    letter-spacing: clamp(2px, 0.3vw, 6px);
+    background: #1e3a5f;
+    display: inline-block;
+    padding: clamp(6px, 0.8vh, 12px) clamp(20px, 2.5vw, 50px);
+    border-radius: clamp(15px, 2vw, 30px);
 }
 
 .date-display {
@@ -184,6 +221,11 @@ body > * {
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: clamp(1px, 0.08vw, 3px);
+    color: white;
+}
+
+.day-highlight {
+    color: #ffd503;
 }
 
 /* Content Layout (List vs Preview) */
@@ -206,91 +248,47 @@ body > * {
 }
 
 .schedule-row {
-    background-color: var(--hope-orange);
-    min-height: clamp(70px, 11vh, 150px);
-    border-radius: clamp(8px, 0.6vw, 15px);
+    background-color: #ffd503;
+    min-height: clamp(60px, 9vh, 120px);
+    border-radius: clamp(25px, 3vw, 60px);
     display: flex;
     align-items: center;
-    padding: clamp(10px, 2vh, 25px) clamp(20px, 3vw, 60px);
-    box-shadow: 0 clamp(8px, 1vh, 15px) 0px var(--hope-blue-shadow); 
-    color: white;
+    padding: clamp(8px, 1.5vh, 20px) clamp(15px, 2vw, 40px);
+    box-shadow: 0 clamp(6px, 0.8vh, 12px) 0px rgba(0,0,0,0.3);
+    color: #1e3a5f;
+    position: relative;
+    border: clamp(2px, 0.25vw, 5px) solid #1e3a5f;
 }
 
 .time-range {
-    font-size: clamp(16px, 1.9vw, 42px);
-    font-weight: bold;
-    min-width: clamp(150px, 19vw, 350px);
+    font-size: clamp(14px, 1.6vw, 36px);
+    font-weight: 900;
+    min-width: clamp(130px, 16vw, 280px);
     flex-shrink: 0;
+    padding-right: clamp(15px, 2vw, 30px);
+    border-right: clamp(2px, 0.25vw, 4px) solid #1e3a5f;
 }
 
 .program-name {
-    font-size: clamp(20px, 2.5vw, 55px);
-    font-weight: bold;
+    font-size: clamp(18px, 2.2vw, 48px);
+    font-weight: 900;
     text-transform: uppercase;
+    letter-spacing: clamp(0.5px, 0.05vw, 2px);
+    padding-left: clamp(15px, 2vw, 30px);
 }
-/* --- CALENDAR BOX --- */
-.calendar-box {
-    width: clamp(250px, 25vw, 500px);
-    min-height: clamp(200px, 25vh, 350px);
-    background: white;
-    border: clamp(2px, 0.2vw, 5px) solid #7ba6cc;
-    box-shadow: 0 clamp(8px, 1vh, 20px) clamp(15px, 2vh, 30px) rgba(0,0,0,0.2);
-    margin-bottom: clamp(15px, 2vh, 35px);
-    padding: clamp(10px, 1vh, 20px);
-    display: flex;
-    flex-direction: column;
-}
-
-.calendar-header {
-    font-size: clamp(14px, 1.4vw, 32px);
-    font-weight: bold;
-    text-align: center;
-    color: var(--hope-navy);
-    margin-bottom: clamp(8px, 1vh, 18px);
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: clamp(2px, 0.15vw, 5px);
-    flex: 1;
-}
-
-.calendar-day-label {
-    font-size: clamp(10px, 0.85vw, 20px);
-    font-weight: bold;
-    text-align: center;
-    color: var(--hope-orange);
-}
-
-.calendar-day {
-    font-size: clamp(9px, 0.78vw, 18px);
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-dark);
-}
-
-.calendar-day.today {
-    background: var(--hope-orange);
-    color: white;
-    border-radius: 50%;
-    font-weight: bold;
-}
-
 /* --- PREVIEW IMAGE AREA --- */
 .preview-area {
     display: flex;
     flex-direction: column;
     width: clamp(250px, 25vw, 500px);
     flex-shrink: 0;
+    gap: clamp(15px, 2vh, 30px);
 }
 
 .image-box {
     width: 100%;
-    min-height: clamp(200px, 25vh, 350px);
-    background: #000;
+    min-height: clamp(180px, 22vh, 320px);
+    background: white;
     border: clamp(2px, 0.2vw, 5px) solid #7ba6cc;
     overflow: hidden;
     box-shadow: 0 clamp(8px, 1vh, 20px) clamp(15px, 2vh, 30px) rgba(0,0,0,0.2);
@@ -300,6 +298,21 @@ body > * {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.video-box {
+    width: 100%;
+    min-height: clamp(180px, 22vh, 320px);
+    background: #000;
+    border: clamp(2px, 0.2vw, 5px) solid #7ba6cc;
+    overflow: hidden;
+    box-shadow: 0 clamp(8px, 1vh, 20px) clamp(15px, 2vh, 30px) rgba(0,0,0,0.2);
+}
+
+.video-box iframe {
+    width: 100%;
+    height: 100%;
+    min-height: clamp(180px, 22vh, 320px);
 }
 
 /* --- FOOTER --- */
