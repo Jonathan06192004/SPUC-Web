@@ -53,10 +53,10 @@
 
 <aside class="preview-area">
 
-<!-- LIVE CALENDAR -->
+<!-- IMAGE CAROUSEL -->
 
 <div class="image-box">
-<div id="liveCalendar"></div>
+<img id="carouselImage" src="" alt="Carousel">
 </div>
 
 <!-- VIDEO -->
@@ -114,60 +114,7 @@ document.getElementById("todayDate").innerHTML =
 `<span class="day-highlight">${dayName}</span> ${monthName} ${dateNumber}, ${year}`;
 
 
-/* LIVE CALENDAR */
 
-/* IMPROVED LIVE CALENDAR */
-function generateCalendar() {
-    const calendar = document.getElementById("liveCalendar");
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-
-    const firstDay = new Date(year, month, 1).getDay();
-    const lastDate = new Date(year, month + 1, 0).getDate();
-
-    const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
-
-    let html = `
-        <h2 style="text-align:center; color:#1e3a5f; margin-bottom:10px;">
-            ${monthNames[month]} ${year}
-        </h2>
-        <table class="calendar-table">
-            <thead>
-                <tr>
-                    <th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>`;
-
-    // Fill empty cells for days before the 1st
-    for (let i = 0; i < firstDay; i++) {
-        html += "<td></td>";
-    }
-
-    // Fill days
-    for (let day = 1; day <= lastDate; day++) {
-        if ((firstDay + day - 1) % 7 === 0 && day !== 1) {
-            html += "</tr><tr>";
-        }
-
-        const isToday = (day === now.getDate());
-        html += `<td>
-                    <div class="day-cell ${isToday ? 'today-highlight' : ''}">
-                        ${day}
-                    </div>
-                 </td>`;
-    }
-
-    html += "</tr></tbody></table>";
-    calendar.innerHTML = html;
-}
-
-generateCalendar();
 
 </script>
 
