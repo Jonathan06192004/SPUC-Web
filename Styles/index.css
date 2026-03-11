@@ -19,7 +19,7 @@ html, body {
     overflow: hidden;
     background: url('../Assets/BG.jpg') no-repeat center center;
     background-size: cover;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 
 body {
@@ -79,7 +79,7 @@ body > * {
 }
 
 .welcome-text {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: clamp(16px, 2vw, 48px);
     letter-spacing: clamp(3px, 0.4vw, 12px);
     font-weight: 300;
@@ -87,7 +87,7 @@ body > * {
 }
 
 .channel-name {
-    font-family: 'Urbanist', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: clamp(38px, 7vw, 98px);
     font-weight: 900;
     margin: -0.5vh 0;
@@ -95,12 +95,12 @@ body > * {
 }
 
 .subtitle-text {
-    font-family: 'Urbanist', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: clamp(10px, 1.1vw, 24px);
     letter-spacing: clamp(6px, 3.15vw, 4px);
     margin-left: clamp(100px, 25vw, 434px);
     margin-top: clamp(-7px, -1.2vh, -20px);
-    font-weight: lighter;
+    font-weight: 500;
     opacity: 85%;
 }
 
@@ -179,7 +179,7 @@ body > * {
     font-size: clamp(22px, 75px, 40px);
     font-weight: 400;
     color: #f9f8fa;
-    font-family: 'Courier New', monospace;
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* --- MAIN CONTAINER --- */
