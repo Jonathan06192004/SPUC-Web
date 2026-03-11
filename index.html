@@ -255,31 +255,41 @@ async function loadTodayEvents() {
     });
 
     // 3. Render the sorted events
-    eventsArray.forEach(data => {
-        let [startStr, endStr] = data.time.split('-');
-        if (!startStr.includes('PM') && !startStr.includes('AM')) {
-            startStr += endStr.match(/(AM|PM)/i)[0];
-        }
-
-        const startMinutes = convertToMinutes(startStr);
-        const endMinutes = convertToMinutes(endStr);
-        const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-        let badge = "";
-        if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-            badge = `<div class="ongoing-badge">ON-GOING</div>`;
-        }
-
-        const row = document.createElement("div");
-        row.className = "schedule-row";
-        row.innerHTML = `
-            <span class="time-range">${data.time}</span>
-            <span class="program-name">${data.title}</span>
-            ${badge}
+    if(eventsArray.length === 0) {
+        const noEvents = document.createElement("div");
+        noEvents.className = "schedule-row";
+        noEvents.innerHTML = `
+            <span class="time-range">--:--</span>
+            <span class="program-name">No events scheduled for today</span>
         `;
-        container.appendChild(row);
-    });
+        container.appendChild(noEvents);
+    } else {
+        eventsArray.forEach(data => {
+            let [startStr, endStr] = data.time.split('-');
+            if (!startStr.includes('PM') && !startStr.includes('AM')) {
+                startStr += endStr.match(/(AM|PM)/i)[0];
+            }
+
+            const startMinutes = convertToMinutes(startStr);
+            const endMinutes = convertToMinutes(endStr);
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            let badge = "";
+            if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
+                badge = `<div class="ongoing-badge">ON-GOING</div>`;
+            }
+
+            const row = document.createElement("div");
+            row.className = "schedule-row";
+            row.innerHTML = `
+                <span class="time-range">${data.time}</span>
+                <span class="program-name">${data.programName || 'UNDEFINED'}</span>
+                ${badge}
+            `;
+            container.appendChild(row);
+        });
+    }
 }
 
 loadTodayEvents();

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -124,34 +124,77 @@ function renderCalendar(){
     });
 }
 
-// SAVE EVENT (Updated with new structure)
+// SAVE EVENT (Updated with sequential IDs)
 form.addEventListener("submit", async(e)=>{
     e.preventDefault();
     if(!selectedDate){ alert("Select a date"); return; }
     
     const rawTime = timeSelect.value === "custom" ? customTimeInput.value : timeSelect.value;
     const programId = titleSelect.value === "custom" ? null : titleSelect.value;
-    const customProgramName = titleSelect.value === "custom" ? customTitleInput.value : null;
     
-    const newEvent = {
-        date: selectedDate.toDateString(),
-        time: formatTimeForDB(rawTime),
-        programId: programId,
-        customProgramName: customProgramName,
-        description: document.getElementById("description").value,
-        adminId: currentAdminId
-    };
-    
-    if(editID){
-        await updateDoc(doc(db,"events",editID),newEvent);
-        editID = null;
-    }else{
-        await addDoc(collection(db,"events"),newEvent);
+    // Get program name
+    let programName = "";
+    if(titleSelect.value === "custom"){
+        programName = customTitleInput.value;
+    } else {
+        const selectedProgram = programs.find(p => p.id === titleSelect.value);
+        programName = selectedProgram ? selectedProgram.name : "";
     }
-    form.reset();
-    selectedDate=null;
-    eventDetails.style.display="none";
-    loadEvents();
+    
+    try {
+        if(editID){
+            // Update existing event
+            const updateEvent = {
+                date: selectedDate.toDateString(),
+                time: formatTimeForDB(rawTime),
+                programId: programId,
+                programName: programName,
+                description: document.getElementById("description").value,
+                adminId: currentAdminId
+            };
+            await updateDoc(doc(db,"events",editID), updateEvent);
+            editID = null;
+        }else{
+            // Create new event with sequential ID
+            const eventsSnapshot = await getDocs(collection(db, "events"));
+            let maxEventNum = 0;
+            
+            // Find the highest event number
+            eventsSnapshot.forEach((docSnap) => {
+                const docId = docSnap.id;
+                if(docId.startsWith("event")){
+                    const num = parseInt(docId.replace("event", ""));
+                    if(!isNaN(num) && num > maxEventNum){
+                        maxEventNum = num;
+                    }
+                }
+            });
+            
+            const newEventId = `event${maxEventNum + 1}`;
+            
+            const newEvent = {
+                date: selectedDate.toDateString(),
+                time: formatTimeForDB(rawTime),
+                programId: programId,
+                programName: programName,
+                description: document.getElementById("description").value,
+                adminId: currentAdminId
+            };
+            
+            // Use setDoc with custom ID instead of addDoc
+            await setDoc(doc(db, "events", newEventId), newEvent);
+            console.log("Event created with ID:", newEventId);
+        }
+        
+        form.reset();
+        selectedDate=null;
+        eventDetails.style.display="none";
+        loadEvents();
+        alert("Event saved successfully!");
+    } catch(error) {
+        console.error("Error saving event:", error);
+        alert("Error saving event: " + error.message);
+    }
 });
 
 // RENDER EVENTS
@@ -159,8 +202,7 @@ function renderEvents(){
     eventsContainer.innerHTML="";
     if(events.length===0){ eventsContainer.innerHTML=`<p>No events yet</p>`; return; }
     events.forEach((event)=>{
-        const program = programs.find(p => p.id === event.programId);
-        const programName = program ? program.name : (event.customProgramName || "Custom Event");
+        const programName = event.programName || "Unnamed Program";
         const eventDate = new Date(event.date);
         const displayDate = days[eventDate.getDay()] + ', ' + eventDate.toLocaleDateString();
         
@@ -192,7 +234,7 @@ window.editEvent = function(id){
         titleSelect.value = event.programId;
     }else{
         titleSelect.value = "custom";
-        customTitleInput.value = event.customProgramName;
+        customTitleInput.value = event.programName;
         customTitleInput.style.display = "block";
     }
     document.getElementById("description").value = event.description;
