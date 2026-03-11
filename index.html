@@ -195,16 +195,18 @@ const db = getFirestore(app);
 /* convert time to minutes */
 
 function convertToMinutes(timeString) {
-    // Remove "PM"/"AM" and any extra spaces
+    const isPM = timeString.toUpperCase().includes('PM');
+    const isAM = timeString.toUpperCase().includes('AM');
+    
     let cleanTime = timeString.replace(/(AM|PM)/i, '').trim();
     let [h, m] = cleanTime.split(':');
     
     h = parseInt(h);
-    m = m ? parseInt(m) : 0; // Handle if :00 is missing
+    m = m ? parseInt(m) : 0;
 
     // Convert to 24-hour format
-    if (timeString.toUpperCase().includes('PM') && h !== 12) h += 12;
-    if (timeString.toUpperCase().includes('AM') && h === 12) h = 0;
+    if (isPM && h !== 12) h += 12;
+    if (isAM && h === 12) h = 0;
 
     return h * 60 + m;
 }
@@ -238,9 +240,18 @@ async function loadTodayEvents() {
 
     // 2. Sort the array by start time
     eventsArray.sort((a, b) => {
-        const startA = convertToMinutes(a.time.split('-')[0].trim());
-        const startB = convertToMinutes(b.time.split('-')[0].trim());
-        return startA - startB;
+        let [startA, endA] = a.time.split('-');
+        let [startB, endB] = b.time.split('-');
+        
+        // Add AM/PM to start time if missing
+        if (!startA.includes('PM') && !startA.includes('AM')) {
+            startA += endA.match(/(AM|PM)/i)[0];
+        }
+        if (!startB.includes('PM') && !startB.includes('AM')) {
+            startB += endB.match(/(AM|PM)/i)[0];
+        }
+        
+        return convertToMinutes(startA) - convertToMinutes(startB);
     });
 
     // 3. Render the sorted events

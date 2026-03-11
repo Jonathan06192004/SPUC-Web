@@ -30,9 +30,11 @@ const titleSelect = document.getElementById("title");
 const customTitleInput = document.getElementById("customTitle");
 
 let events = [];
+let programs = [];
 let selectedDate = null;
 let currentDate = new Date();
 let editID = null;
+let currentAdminId = localStorage.getItem("adminId") || "admin1";
 
 const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -42,6 +44,48 @@ function formatTimeForDB(timeStr) {
     // Replaces numbers like "4" or "6" with "4:00" or "6:00"
     return timeStr.replace(/(\d+)(?::\d+)?(?=\s*(?:-|–)\s*(\d+)(?::\d+)?)/g, '$1:00')
                   .replace(/(\d+)(?::\d+)?(?=\s*[AP]M)/g, '$1:00');
+}
+
+// LOAD PROGRAMS
+async function loadPrograms(){
+    try {
+        programs = [];
+        const querySnapshot = await getDocs(collection(db,"programs"));
+        console.log("Programs found:", querySnapshot.size);
+        querySnapshot.forEach((docSnap)=>{
+            const programData = { id: docSnap.id, ...docSnap.data() };
+            console.log("Program:", programData);
+            programs.push(programData);
+        });
+        console.log("Total programs loaded:", programs.length);
+        console.log("Programs array:", programs);
+        populateProgramDropdown();
+    } catch(error) {
+        console.error("Error loading programs:", error);
+        alert("Error loading programs: " + error.message);
+    }
+}
+
+// POPULATE PROGRAM DROPDOWN
+function populateProgramDropdown(){
+    const titleSelect = document.getElementById("title");
+    if(!titleSelect) {
+        console.error("Title select element not found!");
+        return;
+    }
+    
+    console.log("Starting to populate dropdown...");
+    titleSelect.innerHTML = '<option value="">Choose program type</option>';
+    
+    programs.forEach(program => {
+        const programName = program.name || "Unnamed Program";
+        console.log(`Adding option: ${programName} (ID: ${program.id})`);
+        titleSelect.innerHTML += `<option value="${program.id}">${programName}</option>`;
+    });
+    
+    titleSelect.innerHTML += '<optgroup label="Custom Program"><option value="custom">Enter custom program...</option></optgroup>';
+    console.log("Dropdown populated with", programs.length, "programs");
+    console.log("Final dropdown HTML:", titleSelect.innerHTML);
 }
 
 // LOAD EVENTS
@@ -80,19 +124,22 @@ function renderCalendar(){
     });
 }
 
-// SAVE EVENT (Updated with Formatting)
+// SAVE EVENT (Updated with new structure)
 form.addEventListener("submit", async(e)=>{
     e.preventDefault();
     if(!selectedDate){ alert("Select a date"); return; }
     
     const rawTime = timeSelect.value === "custom" ? customTimeInput.value : timeSelect.value;
+    const programId = titleSelect.value === "custom" ? null : titleSelect.value;
+    const customProgramName = titleSelect.value === "custom" ? customTitleInput.value : null;
     
     const newEvent = {
         date: selectedDate.toDateString(),
-        day: days[selectedDate.getDay()] + ', ' + selectedDate.toLocaleDateString(),
-        time: formatTimeForDB(rawTime), // Automatically formats before saving
-        title: titleSelect.value === "custom" ? customTitleInput.value : titleSelect.value,
-        description: document.getElementById("description").value
+        time: formatTimeForDB(rawTime),
+        programId: programId,
+        customProgramName: customProgramName,
+        description: document.getElementById("description").value,
+        adminId: currentAdminId
     };
     
     if(editID){
@@ -112,10 +159,15 @@ function renderEvents(){
     eventsContainer.innerHTML="";
     if(events.length===0){ eventsContainer.innerHTML=`<p>No events yet</p>`; return; }
     events.forEach((event)=>{
+        const program = programs.find(p => p.id === event.programId);
+        const programName = program ? program.name : (event.customProgramName || "Custom Event");
+        const eventDate = new Date(event.date);
+        const displayDate = days[eventDate.getDay()] + ', ' + eventDate.toLocaleDateString();
+        
         eventsContainer.innerHTML += `
         <div class="event-card">
-            <div class="event-header"><strong>${event.day} | ${event.time}</strong></div>
-            <h3>${event.title}</h3>
+            <div class="event-header"><strong>${displayDate} | ${event.time}</strong></div>
+            <h3>${programName}</h3>
             <p>${event.description || ""}</p>
             <div class="btn-group">
                 <button onclick="editEvent('${event.id}')">Edit</button>
@@ -136,7 +188,13 @@ window.editEvent = function(id){
     selectedDate = new Date(event.date);
     selectedDateText.textContent = event.date;
     timeSelect.value = event.time;
-    titleSelect.value = event.title;
+    if(event.programId){
+        titleSelect.value = event.programId;
+    }else{
+        titleSelect.value = "custom";
+        customTitleInput.value = event.customProgramName;
+        customTitleInput.style.display = "block";
+    }
     document.getElementById("description").value = event.description;
     eventDetails.style.display="block";
 }
@@ -161,6 +219,7 @@ nextMonth.onclick = ()=>{
 }
 
 // START
+loadPrograms();
 loadEvents();
 
 // Dropdown menu toggle

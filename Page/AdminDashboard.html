@@ -66,16 +66,16 @@
                     <select id="time" required>
                         <option value="">Choose time slot</option>
                         <optgroup label="AM">
-                            <option value="6-8 AM">6:00 - 8:00 AM</option>
-                            <option value="8-10 AM">8:00 - 10:00 AM</option>
-                            <option value="10-12 AM">10:00 - 12:00 AM</option>
+                            <option value="6-8 AM">6:00AM - 8:00 AM</option>
+                            <option value="8-10 AM">8:00AM - 10:00 AM</option>
+                            <option value="10-12 AM">10:00AM - 12:00 PM</option>
                         </optgroup>
                         <optgroup label="PM">
-                            <option value="12-2 PM">12:00 - 2:00 PM</option>
-                            <option value="2-4 PM">2:00 - 4:00 PM</option>
-                            <option value="4-6 PM">4:00 - 6:00 PM</option>
-                            <option value="6-8 PM">6:00 - 8:00 PM</option>
-                            <option value="8-10 PM">8:00 - 10:00 PM</option>
+                            <option value="12-2 PM">12:00PM - 2:00 PM</option>
+                            <option value="2-4 PM">2:00PM - 4:00 PM</option>
+                            <option value="4-6 PM">4:00PM - 6:00 PM</option>
+                            <option value="6-8 PM">6:00PM - 8:00 PM</option>
+                            <option value="8-10 PM">8:00PM - 10:00 PM</option>
                         </optgroup>
                         <optgroup label="Custom Time">
                             <option value="custom">Enter custom time...</option>
@@ -84,34 +84,13 @@
                     
                     <input type="text" id="customTime" placeholder="Enter custom time (e.g., 3-5 PM)" style="display: none;">
 
-                    <label><i class="fas fa-tag"></i> Event Type</label>
+                     <label><i class="fas fa-tag"></i> Program Type</label>
                     <select id="title" required>
-                        <option value="">Choose event type</option>
-                        <option value="10 DAYS OF PRAYER">10 DAYS OF PRAYER</option>
-                        <option value="ADRATV">ADRATV</option>
-                        <option value="DEAR DOKTOR">DEAR DOKTOR</option>
-                        <option value="DUYOG">DUYOG</option>
-                        <option value="HARANA SA KABUNTAGON">HARANA SA KABUNTAGON</option>
-                        <option value="HEAL THY LIFESTYLE">HEAL THY LIFESTYLE</option>
-                        <option value="HOPE GENERATION">HOPE GENERATION</option>
-                        <option value="HOPE WORSHIP">HOPE WORSHIP</option>
-                        <option value="KIDS OF HOPE">KIDS OF HOPE</option>
-                        <option value="LET'S PRAY PILIPINAS">LET'S PRAY PILIPINAS</option>
-                        <option value="MIZPAH LIVE NEWS AND COMMENTARY">MIZPAH LIVE NEWS AND COMMENTARY</option>
-                        <option value="NIGHTLY SERIES">NIGHTLY SERIES</option>
-                        <option value="PANIMBAYA SA KABUNTAGON">PANIMBAYA SA KABUNTAGON</option>
-                        <option value="PARTNERS OF HOPE">PARTNERS OF HOPE</option>
-                        <option value="PRAISE AND PRAY">PRAISE AND PRAY</option>
-                        <option value="PRAISE EXPERIENCE">PRAISE EXPERIENCE</option>
-                        <option value="TAKNA SA PAGTUON">TAKNA SA PAGTUON</option>
-                        <option value="TUBURAN SA PAGLAUM">TUBURAN SA PAGLAUM</option>
-                        <option value="MY JOURNEY WITH GOD">MY JOURNEY WITH GOD</option>
-                        <optgroup label="Custom Event">
-                            <option value="custom">Enter custom event...</option>
-                        </optgroup>
+                        <option value="">Choose program type</option>
+                        <!-- Programs will be loaded dynamically from Firebase -->
                     </select>
                     
-                    <input type="text" id="customTitle" placeholder="Enter custom event name" style="display: none;">
+                    <input type="text" id="customTitle" placeholder="Enter custom program name" style="display: none;">
 
                     <label><i class="fas fa-align-left"></i> Description</label>
                     <input type="text" id="description" placeholder="Event description (Optional)">
