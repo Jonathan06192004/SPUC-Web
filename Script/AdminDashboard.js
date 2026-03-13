@@ -14,17 +14,83 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let currentDate = new Date(2026, 2, 12); // March 12, 2026
+let currentDate = new Date(2026, 2, 12);
 let selectedDate = new Date(2026, 2, 12);
 
 const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 const dayNames = ["SUN", "MON", "TUES", "WED", "THU", "FRI", "SAT"];
 
+function updateMonthDisplay() {
+    const months = [];
+    for (let i = -2; i <= 2; i++) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+        const monthName = monthNames[date.getMonth()];
+        const year = date.getFullYear();
+        months.push({ name: monthName, year: year, offset: i });
+    }
+
+    const monthNav = document.querySelector('.month-nav');
+    monthNav.innerHTML = '';
+
+    // First month (2 months before)
+    const span1 = document.createElement('span');
+    span1.className = 'month-label';
+    span1.textContent = months[0].name;
+    monthNav.appendChild(span1);
+
+    // Second month (1 month before)
+    const span2 = document.createElement('span');
+    span2.className = 'month-label';
+    span2.textContent = months[1].name;
+    monthNav.appendChild(span2);
+
+    // Previous button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'nav-btn prev';
+    prevBtn.textContent = '<';
+    prevBtn.type = 'button';
+    prevBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        generateCalendar(currentDate);
+        updateMonthDisplay();
+    });
+    monthNav.appendChild(prevBtn);
+
+    // Current month
+    const currentSpan = document.createElement('h3');
+    currentSpan.className = 'current-month';
+    currentSpan.id = 'currentMonth';
+    currentSpan.textContent = `${months[2].name} ${months[2].year}`;
+    monthNav.appendChild(currentSpan);
+
+    // Next button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'nav-btn next';
+    nextBtn.textContent = '>';
+    nextBtn.type = 'button';
+    nextBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        generateCalendar(currentDate);
+        updateMonthDisplay();
+    });
+    monthNav.appendChild(nextBtn);
+
+    // Fourth month (1 month after)
+    const span4 = document.createElement('span');
+    span4.className = 'month-label';
+    span4.textContent = months[3].name;
+    monthNav.appendChild(span4);
+
+    // Fifth month (2 months after)
+    const span5 = document.createElement('span');
+    span5.className = 'month-label';
+    span5.textContent = months[4].name;
+    monthNav.appendChild(span5);
+}
+
 function generateCalendar(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
-    
-    document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
     
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -33,7 +99,6 @@ function generateCalendar(date) {
     const calendarDates = document.getElementById('calendarDates');
     calendarDates.innerHTML = '';
     
-    // Previous month dates
     for (let i = firstDay - 1; i >= 0; i--) {
         const btn = document.createElement('button');
         btn.className = 'date-btn other-month';
@@ -42,7 +107,6 @@ function generateCalendar(date) {
         calendarDates.appendChild(btn);
     }
     
-    // Current month dates
     for (let day = 1; day <= daysInMonth; day++) {
         const btn = document.createElement('button');
         btn.className = 'date-btn';
@@ -58,7 +122,6 @@ function generateCalendar(date) {
         calendarDates.appendChild(btn);
     }
     
-    // Next month dates
     const totalCells = calendarDates.children.length;
     const remainingCells = 42 - totalCells;
     for (let day = 1; day <= remainingCells; day++) {
@@ -148,18 +211,8 @@ document.getElementById('eventForm').addEventListener('submit', async (e) => {
     }
 });
 
-document.querySelector('.nav-btn.prev').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    generateCalendar(currentDate);
-});
-
-document.querySelector('.nav-btn.next').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    generateCalendar(currentDate);
-});
-
-// Initialize
 generateCalendar(currentDate);
+updateMonthDisplay();
 updateFormDate();
 loadTimeSlots();
 loadPrograms();
