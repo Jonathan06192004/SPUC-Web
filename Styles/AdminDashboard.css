@@ -31,6 +31,17 @@ body {
     display: flex;
     align-items: center;
     padding: 0 30px;
+    z-index: 3;
+}
+
+.header-yellow {
+    position: absolute;
+    left: clamp(53vw, -3vw, -30px);
+    top: clamp(14px, 3vh, 70px);
+    width: clamp(74px, 12vw, 200px);
+    height: 100%;
+    background: url(/Assets/header-yellow.png) no-repeat center center;
+    background-size: 100% 74%;
     z-index: 2;
 }
 
@@ -41,7 +52,6 @@ body {
     align-items: center;
     justify-content: flex-end;
     padding: 0 40px;
-    clip-path: polygon(50px 0, 100% 0, 100% 100%, 0 100%);
     z-index: 1;
 }
 
@@ -114,9 +124,9 @@ body {
 
 /* Container Layout */
 .container {
-    display: flex;
+    display: block;
     width: 100%;
-    min-height: calc(100vh - 140px);
+    position: relative;
 }
 
 /* Sidebar */
@@ -125,7 +135,11 @@ body {
     background: #1B3B72;
     padding: 40px 20px;
     border-radius: 0 70px 70px 0;
-    /* box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1); */
+    position: fixed;
+    left: 0;
+    top: 23vh;
+    height: calc(100vh - 23vh);
+    overflow-y: auto;
 }
 
 .admin-profile {
@@ -214,12 +228,15 @@ body {
 
 /* Main Content */
 .main-content {
-    flex: 1;
     padding: 40px;
     background: #ffffff;
     margin: 0;
+    margin-left: 55vh;
     border-radius: 0;
     box-shadow: none;
+    font-family: 'Montserrat', sans-serif;
+    height: calc(100vh - 23vh);
+    overflow-y: auto;
 }
 
 .content-header {
@@ -255,8 +272,8 @@ body {
 }
 
 .month-label {
-    color: #666;
-    font-size: 13px;
+    color:#1b3b71;
+    font-size: 20px;
     font-weight: 500;
 }
 
@@ -275,8 +292,8 @@ body {
 }
 
 .current-month {
-    font-size: 24px;
-    color: #ffc107;
+    font-size: 28px;
+    color: #ffd503;
     font-weight: bold;
     letter-spacing: 1px;
     min-width: 150px;
@@ -301,7 +318,7 @@ body {
     text-align: center;
     font-weight: bold;
     color: #1e3a5f;
-    font-size: 13px;
+    font-size: 24px;
     padding: 10px;
 }
 
@@ -319,7 +336,7 @@ body {
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 24px;
     transition: all 0.3s ease;
 }
 
