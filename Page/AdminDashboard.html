@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Hope Channel</title>
+    <title>Admin | Events Management</title>
     <link rel="stylesheet" href="../Styles/AdminDashboard.css">
 </head>
 <body>
@@ -38,19 +38,19 @@
                 <p class="admin-text">ADMIN</p>
             </div>
             <nav class="sidebar-menu">
-                <a href="#" class="menu-item active">
+                <a href="AdminDashboard.html" class="menu-item active">
                     <img src="../Assets/event-icon.png" alt="Event" class="menu-icon-img">
                     <span class="menu-text">EVENT MANAGEMENT</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="AdminVideos.html" class="menu-item">
                     <img src="../Assets/video-icon.png" alt="Videos" class="menu-icon-img">
                     <span class="menu-text">VIDEOS MANAGEMENT</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="AdminImages.html" class="menu-item">
                     <img src="../Assets/images-icon.png" alt="Photos" class="menu-icon-img">
                     <span class="menu-text">PHOTOS MANAGEMENT</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="AdminProfile.html" class="menu-item">
                     <img src="../Assets/profile.png" alt="Profile" class="menu-icon-img">
                     <span class="menu-text">PROFILE</span>
                 </a>
@@ -102,19 +102,19 @@
                 </div>
                 <form class="event-form" id="eventForm">
                     <div class="form-group">
-                        <label for="timeSlot">⏰ SELECT TIME</label>
+                        <label for="timeSlot">SELECT TIME</label>
                         <select id="timeSlot" class="form-control" required>
                             <option value="">Choose time slot</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="program">📺 SELECT PROGRAM</label>
+                        <label for="program">SELECT PROGRAM</label>
                         <select id="program" class="form-control" required>
                             <option value="">Choose the program</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="description">📝 DESCRIPTION</label>
+                        <label for="description">DESCRIPTION</label>
                         <input type="text" id="description" class="form-control" placeholder="Describe the event (Optional)">
                     </div>
                     <button type="submit" class="btn-submit">ADD TO SCHEDULE</button>
