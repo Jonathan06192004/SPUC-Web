@@ -1,344 +1,165 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyDzSCJ8XellJRvOSBZ7cTCA2OcmFh8jSrs",
-  authDomain: "spuc-events-web.firebaseapp.com",
-  projectId: "spuc-events-web",
-  storageBucket: "spuc-events-web.firebasestorage.app",
-  messagingSenderId: "989356465487",
-  appId: "1:989356465487:web:428b119629a939e725793a",
-  measurementId: "G-QE1HPE63EH"
+    apiKey: "AIzaSyDzSCJ8XellJRvOSBZ7cTCA2OcmFh8jSrs",
+    authDomain: "spuc-events-web.firebaseapp.com",
+    projectId: "spuc-events-web",
+    storageBucket: "spuc-events-web.firebasestorage.app",
+    messagingSenderId: "989356465487",
+    appId: "1:989356465487:web:428b119629a939e725793a",
+    measurementId: "G-QE1HPE63EH"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// DOM Elements
-const form = document.getElementById("eventForm");
-const eventsContainer = document.getElementById("eventsContainer");
-const calendarGrid = document.getElementById("calendarGrid");
-const monthYear = document.getElementById("monthYear");
-const prevMonth = document.getElementById("prevMonth");
-const nextMonth = document.getElementById("nextMonth");
-const eventDetails = document.getElementById("eventDetails");
-const selectedDateText = document.getElementById("selectedDateText");
-const timeSelect = document.getElementById("time");
-const customTimeInput = document.getElementById("customTime");
-const titleSelect = document.getElementById("title");
-const customTitleInput = document.getElementById("customTitle");
+let currentDate = new Date(2026, 2, 12); // March 12, 2026
+let selectedDate = new Date(2026, 2, 12);
 
-let events = [];
-let programs = [];
-let selectedDate = null;
-let currentDate = new Date();
-let editID = null;
-let currentAdminId = localStorage.getItem("adminId") || "admin1";
+const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+const dayNames = ["SUN", "MON", "TUES", "WED", "THU", "FRI", "SAT"];
 
-const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-// HELPER: Ensures time is stored in DB with :00 format (e.g., "4:00 - 6:00 PM")
-function formatTimeForDB(timeStr) {
-    // Replaces numbers like "4" or "6" with "4:00" or "6:00"
-    return timeStr.replace(/(\d+)(?::\d+)?(?=\s*(?:-|–)\s*(\d+)(?::\d+)?)/g, '$1:00')
-                  .replace(/(\d+)(?::\d+)?(?=\s*[AP]M)/g, '$1:00');
-}
-
-// LOAD PROGRAMS
-async function loadPrograms(){
-    try {
-        programs = [];
-        const querySnapshot = await getDocs(collection(db,"programs"));
-        console.log("Programs found:", querySnapshot.size);
-        querySnapshot.forEach((docSnap)=>{
-            const programData = { id: docSnap.id, ...docSnap.data() };
-            console.log("Program:", programData);
-            programs.push(programData);
-        });
-        console.log("Total programs loaded:", programs.length);
-        console.log("Programs array:", programs);
-        populateProgramDropdown();
-    } catch(error) {
-        console.error("Error loading programs:", error);
-        alert("Error loading programs: " + error.message);
+function generateCalendar(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    
+    const calendarDates = document.getElementById('calendarDates');
+    calendarDates.innerHTML = '';
+    
+    // Previous month dates
+    for (let i = firstDay - 1; i >= 0; i--) {
+        const btn = document.createElement('button');
+        btn.className = 'date-btn other-month';
+        btn.textContent = daysInPrevMonth - i;
+        btn.disabled = true;
+        calendarDates.appendChild(btn);
+    }
+    
+    // Current month dates
+    for (let day = 1; day <= daysInMonth; day++) {
+        const btn = document.createElement('button');
+        btn.className = 'date-btn';
+        btn.textContent = day;
+        btn.type = 'button';
+        
+        const btnDate = new Date(year, month, day);
+        if (btnDate.toDateString() === selectedDate.toDateString()) {
+            btn.classList.add('selected');
+        }
+        
+        btn.addEventListener('click', () => selectDate(btnDate));
+        calendarDates.appendChild(btn);
+    }
+    
+    // Next month dates
+    const totalCells = calendarDates.children.length;
+    const remainingCells = 42 - totalCells;
+    for (let day = 1; day <= remainingCells; day++) {
+        const btn = document.createElement('button');
+        btn.className = 'date-btn other-month';
+        btn.textContent = day;
+        btn.disabled = true;
+        calendarDates.appendChild(btn);
     }
 }
 
-// POPULATE PROGRAM DROPDOWN
-function populateProgramDropdown(){
-    const titleSelect = document.getElementById("title");
-    if(!titleSelect) {
-        console.error("Title select element not found!");
+function selectDate(date) {
+    selectedDate = new Date(date);
+    generateCalendar(currentDate);
+    updateFormDate();
+    loadTimeSlots();
+}
+
+function updateFormDate() {
+    const dayName = dayNames[selectedDate.getDay()];
+    const monthName = monthNames[selectedDate.getMonth()];
+    const day = selectedDate.getDate();
+    const year = selectedDate.getFullYear();
+    
+    document.getElementById('selectedDate').textContent = `${dayName} ${monthName} ${day}, ${year}`;
+}
+
+async function loadTimeSlots() {
+    const timeSlotSelect = document.getElementById('timeSlot');
+    timeSlotSelect.innerHTML = '<option value="">Choose time slot</option>';
+    
+    try {
+        const snapshot = await getDocs(collection(db, "timeSlots"));
+        snapshot.forEach(doc => {
+            const option = document.createElement('option');
+            option.value = doc.data().time;
+            option.textContent = doc.data().time;
+            timeSlotSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error loading time slots:", error);
+    }
+}
+
+async function loadPrograms() {
+    const programSelect = document.getElementById('program');
+    programSelect.innerHTML = '<option value="">Choose the program</option>';
+    
+    try {
+        const snapshot = await getDocs(collection(db, "programs"));
+        snapshot.forEach(doc => {
+            const option = document.createElement('option');
+            option.value = doc.data().name;
+            option.textContent = doc.data().name;
+            programSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error loading programs:", error);
+    }
+}
+
+document.getElementById('eventForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const timeSlot = document.getElementById('timeSlot').value;
+    const program = document.getElementById('program').value;
+    const description = document.getElementById('description').value;
+    
+    if (!timeSlot || !program) {
+        alert('Please select both time slot and program');
         return;
     }
     
-    console.log("Starting to populate dropdown...");
-    titleSelect.innerHTML = '<option value="">Choose program type</option>';
-    
-    programs.forEach(program => {
-        const programName = program.name || "Unnamed Program";
-        console.log(`Adding option: ${programName} (ID: ${program.id})`);
-        titleSelect.innerHTML += `<option value="${program.id}">${programName}</option>`;
-    });
-    
-    titleSelect.innerHTML += '<optgroup label="Custom Program"><option value="custom">Enter custom program...</option></optgroup>';
-    console.log("Dropdown populated with", programs.length, "programs");
-    console.log("Final dropdown HTML:", titleSelect.innerHTML);
-}
-
-// LOAD EVENTS
-async function loadEvents(){
-    events = [];
-    const querySnapshot = await getDocs(collection(db,"events"));
-    querySnapshot.forEach((docSnap)=>{
-        events.push({ id: docSnap.id, ...docSnap.data() });
-    });
-    renderEvents();
-    renderCalendar();
-}
-
-// CALENDAR
-function renderCalendar(){
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    monthYear.textContent = `${months[month]} ${year}`;
-    const firstDay = new Date(year,month,1).getDay();
-    const daysInMonth = new Date(year,month+1,0).getDate();
-    let html = days.map(d=>`<div class="day-name">${d}</div>`).join("");
-    for(let i=0;i<firstDay;i++){ html += `<div class="calendar-day empty"></div>`; }
-    for(let day=1;day<=daysInMonth;day++){
-        const date = new Date(year,month,day);
-        const dateStr = date.toDateString();
-        const hasEvent = events.some(e=>e.date===dateStr);
-        html += `<div class="calendar-day ${hasEvent ? "has-event":""}" data-date="${dateStr}">${day}</div>`;
-    }
-    calendarGrid.innerHTML = html;
-    document.querySelectorAll(".calendar-day:not(.empty)").forEach(day=>{
-        day.addEventListener("click",()=>{
-            selectedDate = new Date(day.dataset.date);
-            selectedDateText.textContent = selectedDate.toDateString();
-            eventDetails.style.display="block";
-        });
-    });
-}
-
-// SAVE EVENT (Updated with sequential IDs)
-form.addEventListener("submit", async(e)=>{
-    e.preventDefault();
-    if(!selectedDate){ alert("Select a date"); return; }
-    
-    const rawTime = timeSelect.value === "custom" ? customTimeInput.value : timeSelect.value;
-    const programId = titleSelect.value === "custom" ? null : titleSelect.value;
-    
-    // Get program name
-    let programName = "";
-    if(titleSelect.value === "custom"){
-        programName = customTitleInput.value;
-    } else {
-        const selectedProgram = programs.find(p => p.id === titleSelect.value);
-        programName = selectedProgram ? selectedProgram.name : "";
-    }
-    
     try {
-        if(editID){
-            // Update existing event
-            const updateEvent = {
-                date: selectedDate.toDateString(),
-                time: formatTimeForDB(rawTime),
-                programId: programId,
-                programName: programName,
-                description: document.getElementById("description").value,
-                adminId: currentAdminId
-            };
-            await updateDoc(doc(db,"events",editID), updateEvent);
-            editID = null;
-        }else{
-            // Create new event with sequential ID
-            const eventsSnapshot = await getDocs(collection(db, "events"));
-            let maxEventNum = 0;
-            
-            // Find the highest event number
-            eventsSnapshot.forEach((docSnap) => {
-                const docId = docSnap.id;
-                if(docId.startsWith("event")){
-                    const num = parseInt(docId.replace("event", ""));
-                    if(!isNaN(num) && num > maxEventNum){
-                        maxEventNum = num;
-                    }
-                }
-            });
-            
-            const newEventId = `event${maxEventNum + 1}`;
-            
-            const newEvent = {
-                date: selectedDate.toDateString(),
-                time: formatTimeForDB(rawTime),
-                programId: programId,
-                programName: programName,
-                description: document.getElementById("description").value,
-                adminId: currentAdminId
-            };
-            
-            // Use setDoc with custom ID instead of addDoc
-            await setDoc(doc(db, "events", newEventId), newEvent);
-            console.log("Event created with ID:", newEventId);
-        }
+        await addDoc(collection(db, "events"), {
+            date: selectedDate.toDateString(),
+            time: timeSlot,
+            programName: program,
+            description: description
+        });
         
-        form.reset();
-        selectedDate=null;
-        eventDetails.style.display="none";
-        loadEvents();
-        alert("Event saved successfully!");
-    } catch(error) {
-        console.error("Error saving event:", error);
-        alert("Error saving event: " + error.message);
+        alert('Event added successfully!');
+        document.getElementById('eventForm').reset();
+    } catch (error) {
+        console.error("Error adding event:", error);
+        alert('Error adding event');
     }
 });
 
-// RENDER EVENTS
-function renderEvents(){
-    eventsContainer.innerHTML="";
-    if(events.length===0){ eventsContainer.innerHTML=`<p>No events yet</p>`; return; }
-    events.forEach((event)=>{
-        const programName = event.programName || "Unnamed Program";
-        const eventDate = new Date(event.date);
-        const displayDate = days[eventDate.getDay()] + ', ' + eventDate.toLocaleDateString();
-        
-        eventsContainer.innerHTML += `
-        <div class="event-card">
-            <div class="event-header"><strong>${displayDate} | ${event.time}</strong></div>
-            <h3>${programName}</h3>
-            <p>${event.description || ""}</p>
-            <div class="btn-group">
-                <button onclick="editEvent('${event.id}')">Edit</button>
-                <button onclick="deleteEvent('${event.id}')" class="delete">Delete</button>
-            </div>
-        </div>
-        `;
-    });
-}
+document.querySelector('.nav-btn.prev').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    generateCalendar(currentDate);
+});
 
-// ... (Rest of your existing functions: editEvent, deleteEvent, navigation, UI toggles remain unchanged) ...
-// Ensure you keep your existing bottom functions for Logout, DarkMode, etc.
+document.querySelector('.nav-btn.next').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    generateCalendar(currentDate);
+});
 
-// EDIT EVENT
-window.editEvent = function(id){
-    const event = events.find(e=>e.id===id);
-    editID = id;
-    selectedDate = new Date(event.date);
-    selectedDateText.textContent = event.date;
-    timeSelect.value = event.time;
-    if(event.programId){
-        titleSelect.value = event.programId;
-    }else{
-        titleSelect.value = "custom";
-        customTitleInput.value = event.programName;
-        customTitleInput.style.display = "block";
-    }
-    document.getElementById("description").value = event.description;
-    eventDetails.style.display="block";
-}
-
-// DELETE EVENT
-window.deleteEvent = async function(id){
-    if(confirm("Delete this event?")){
-        await deleteDoc(doc(db,"events",id));
-        loadEvents();
-    }
-}
-
-// MONTH NAVIGATION
-prevMonth.onclick = ()=>{
-    currentDate.setMonth(currentDate.getMonth()-1);
-    renderCalendar();
-}
-
-nextMonth.onclick = ()=>{
-    currentDate.setMonth(currentDate.getMonth()+1);
-    renderCalendar();
-}
-
-// START
+// Initialize
+generateCalendar(currentDate);
+updateFormDate();
+loadTimeSlots();
 loadPrograms();
-loadEvents();
-
-// Dropdown menu toggle
-const menuToggle = document.getElementById("menuToggle");
-const dropdownMenu = document.getElementById("dropdownMenu");
-const darkModeToggle = document.getElementById("darkModeToggle");
-let isDropdownOpen = false;
-
-menuToggle.addEventListener('mouseenter', function() {
-    if (!isDropdownOpen) {
-        dropdownMenu.style.display = 'block';
-    }
-});
-
-menuToggle.addEventListener('click', function(e) {
-    e.stopPropagation();
-    isDropdownOpen = !isDropdownOpen;
-    dropdownMenu.style.display = isDropdownOpen ? 'block' : 'none';
-});
-
-document.querySelector('.user-menu').addEventListener('mouseleave', function() {
-    if (!isDropdownOpen) {
-        dropdownMenu.style.display = 'none';
-    }
-});
-
-document.addEventListener('click', function() {
-    if (isDropdownOpen) {
-        isDropdownOpen = false;
-        dropdownMenu.style.display = 'none';
-    }
-});
-
-// Dark mode toggle
-if (localStorage.getItem('darkMode') === 'enabled') {
-    document.body.classList.add('dark-mode');
-    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
-}
-
-darkModeToggle.addEventListener('click', function() {
-    document.body.classList.toggle('dark-mode');
-    if (document.body.classList.contains('dark-mode')) {
-        localStorage.setItem('darkMode', 'enabled');
-        this.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
-    } else {
-        localStorage.setItem('darkMode', 'disabled');
-        this.innerHTML = '<i class="fas fa-moon"></i><span>Dark Mode</span>';
-    }
-});
-
-// Custom time input
-timeSelect.addEventListener('change', function() {
-    if (this.value === 'custom') {
-        customTimeInput.style.display = 'block';
-        customTimeInput.required = true;
-    } else {
-        customTimeInput.style.display = 'none';
-        customTimeInput.required = false;
-        customTimeInput.value = '';
-    }
-});
-
-// Custom event title input
-titleSelect.addEventListener('change', function() {
-    if (this.value === 'custom') {
-        customTitleInput.style.display = 'block';
-        customTitleInput.required = true;
-    } else {
-        customTitleInput.style.display = 'none';
-        customTitleInput.required = false;
-        customTitleInput.value = '';
-    }
-});
-
-window.logout = function() {
-    if (confirm("Are you sure you want to logout?")) {
-        localStorage.removeItem("isAdminLoggedIn");
-        window.location.href = "LoginAdmin.html";
-    }
-}

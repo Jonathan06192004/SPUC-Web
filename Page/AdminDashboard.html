@@ -3,135 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Manage Events</title>
+    <title>Admin Dashboard - Hope Channel</title>
     <link rel="stylesheet" href="../Styles/AdminDashboard.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
     <!-- Header -->
     <header class="admin-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <div class="logo-icon">
-                    <i class="fas fa-shield-halved"></i>
-                </div>
-                <div>
-                    <h1>Admin Dashboard</h1>
-                    <p>Hope Channel Events Manager</p>
+        <div class="header-white">
+            <div class="header-content">
+                <div class="header-left">
+                    <img src="../Assets/HCLogo.png" alt="Hope Channel Logo" class="hc-logo">
+                    <div class="header-text">
+                        <p class="welcome-text">WELCOME TO</p>
+                        <h1 class="channel-name">Hope Channel</h1>
+                        <p class="subtitle-text">SOUTHWESTERN PHILIPPINES</p>
+                    </div>
                 </div>
             </div>
-            <div class="user-menu">
-                <button class="menu-toggle" id="menuToggle">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <button class="menu-item" onclick="location.href='AdminProfile.html'">
-                        <i class="fas fa-user-circle"></i>
-                        <span>Profile</span>
-                    </button>
-                    <button class="menu-item" id="darkModeToggle">
-                        <i class="fas fa-moon"></i>
-                        <span>Dark Mode</span>
-                    </button>
-                    <button class="logout-btn" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </button>
-                </div>
+        </div>
+        <div class="header-blue">
+            <div class="header-right">
+                <p class="admin-label">EVENT SCHEDULING</p>
+                <h2 class="admin-title">ADMIN INTERFACE</h2>
             </div>
         </div>
     </header>
 
-    <div class="dashboard">
-        <!-- Add Event Form -->
-        <div class="form-container">
-            <h2><i class="fas fa-calendar-plus"></i> Add / Edit Event</h2>
-            <form id="eventForm">
-                <input type="hidden" id="eventIndex">
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="admin-profile">
+                <img src="../Assets/admin-icon.png" alt="Admin" class="admin-icon-img">
+                <p class="admin-text">ADMIN</p>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active">
+                    <img src="../Assets/event-icon.png" alt="Event" class="menu-icon-img">
+                    <span class="menu-text">EVENT MANAGEMENT</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../Assets/video-icon.png" alt="Videos" class="menu-icon-img">
+                    <span class="menu-text">VIDEOS MANAGEMENT</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../Assets/images-icon.png" alt="Photos" class="menu-icon-img">
+                    <span class="menu-text">PHOTOS MANAGEMENT</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../Assets/profile.png" alt="Profile" class="menu-icon-img">
+                    <span class="menu-text">PROFILE</span>
+                </a>
+            </nav>
+            <a href="#" class="menu-item sign-out">
+                <img src="../Assets/signout.png" alt="Sign Out" class="menu-icon-img">
+                <span class="menu-text">SIGN OUT</span>
+            </a>
+        </aside>
 
-                <div class="calendar-container">
-                    <div class="calendar-header">
-                        <button type="button" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                        <h3 id="monthYear"></h3>
-                        <button type="button" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2>MANAGE EVENTS/ PROGRAMS SCHEDULE</h2>
+                <div class="header-line"></div>
+            </div>
+
+            <div class="calendar-section">
+                <!-- Month Navigation -->
+                <div class="month-nav">
+                    <span class="month-label">January</span>
+                    <span class="month-label">February</span>
+                    <button class="nav-btn prev">&lt;</button>
+                    <h3 class="current-month" id="currentMonth">MARCH 2026</h3>
+                    <button class="nav-btn next">&gt;</button>
+                    <span class="month-label">April</span>
+                    <span class="month-label">May</span>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-grid">
+                    <div class="weekdays">
+                        <div class="weekday">SUN</div>
+                        <div class="weekday">MON</div>
+                        <div class="weekday">TUES</div>
+                        <div class="weekday">WED</div>
+                        <div class="weekday">THU</div>
+                        <div class="weekday">FRI</div>
+                        <div class="weekday">SAT</div>
                     </div>
-                    <div class="calendar-grid" id="calendarGrid"></div>
+                    <div class="dates" id="calendarDates"></div>
                 </div>
+            </div>
 
-                <div id="eventDetails" class="event-details" style="display: none;">
-                    <p class="selected-date"><i class="fas fa-calendar-day"></i> <span id="selectedDateText"></span></p>
-                    
-                    <label><i class="fas fa-clock"></i> Select Time</label>
-                    <select id="time" required>
-                        <option value="">Choose time slot</option>
-                        <optgroup label="AM">
-                            <option value="6-8 AM">6:00AM - 8:00 AM</option>
-                            <option value="8-10 AM">8:00AM - 10:00 AM</option>
-                            <option value="10-12 AM">10:00AM - 12:00 PM</option>
-                        </optgroup>
-                        <optgroup label="PM">
-                            <option value="12-2 PM">12:00PM - 2:00 PM</option>
-                            <option value="2-4 PM">2:00PM - 4:00 PM</option>
-                            <option value="4-6 PM">4:00PM - 6:00 PM</option>
-                            <option value="6-8 PM">6:00PM - 8:00 PM</option>
-                            <option value="8-10 PM">8:00PM - 10:00 PM</option>
-                        </optgroup>
-                        <optgroup label="Custom Time">
-                            <option value="custom">Enter custom time...</option>
-                        </optgroup>
-                    </select>
-                    
-                    <input type="text" id="customTime" placeholder="Enter custom time (e.g., 3-5 PM)" style="display: none;">
-
-                     <label><i class="fas fa-tag"></i> Program Type</label>
-                    <select id="title" required>
-                        <option value="">Choose program type</option>
-                        <!-- Programs will be loaded dynamically from Firebase -->
-                    </select>
-                    
-                    <input type="text" id="customTitle" placeholder="Enter custom program name" style="display: none;">
-
-                    <label><i class="fas fa-align-left"></i> Description</label>
-                    <input type="text" id="description" placeholder="Event description (Optional)">
-
-                    <button type="submit">
-                        <i class="fas fa-save"></i>
-                        <span>Add to Schedule</span>
-                    </button>
+            <!-- Event Form -->
+            <div class="event-form-section">
+                <div class="form-header">
+                    <span class="form-date" id="selectedDate">THU MARCH 12, 2026</span>
                 </div>
-            </form>
-        </div>
-
-        <!-- Event List -->
-        <div class="event-list">
-            <h2><i class="fas fa-list"></i> All Events</h2>
-            <div id="eventsContainer"></div>
-        </div>
+                <form class="event-form" id="eventForm">
+                    <div class="form-group">
+                        <label for="timeSlot">⏰ SELECT TIME</label>
+                        <select id="timeSlot" class="form-control" required>
+                            <option value="">Choose time slot</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="program">📺 SELECT PROGRAM</label>
+                        <select id="program" class="form-control" required>
+                            <option value="">Choose the program</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">📝 DESCRIPTION</label>
+                        <input type="text" id="description" class="form-control" placeholder="Describe the event (Optional)">
+                    </div>
+                    <button type="submit" class="btn-submit">ADD TO SCHEDULE</button>
+                </form>
+            </div>
+        </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="admin-footer">
-        <div class="footer-content">
-            <div class="footer-left">
-                <div class="footer-logo">
-                    <i class="fas fa-shield-halved"></i>
-                </div>
-                <div>
-                    <p class="footer-title">Hope Channel</p>
-                    <p class="footer-subtitle">Admin Management System</p>
-                </div>
-            </div>
-            <div class="footer-right">
-                <a href="../index.html" class="home-btn">
-                    <i class="fas fa-home"></i>
-                    <span>Back to Home</span>
-                </a>
-            </div>
-        </div>
-    </footer>
-
-<script type="module" src="../script/AdminDashboard.js"></script>
-
+    <script type="module" src="../Script/AdminDashboard.js"></script>
 </body>
 </html>
