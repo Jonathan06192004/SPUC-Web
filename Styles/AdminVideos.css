@@ -36,12 +36,12 @@ body {
 
 .header-yellow {
     position: absolute;
-    left: clamp(53vw, -3vw, -30px);
-    top: clamp(14px, 3vh, 70px);
-    width: clamp(74px, 12vw, 200px);
+    left: calc(31% - 298px);
+    top: 25px;
+    width: clamp(800px, 100vw, 1000px);
     height: 100%;
     background: url(/Assets/header-yellow.png) no-repeat center center;
-    background-size: 100% 74%;
+    background-size: 98% 100%;
     z-index: 2;
 }
 
