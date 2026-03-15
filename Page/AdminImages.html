@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | Videos Management</title>
-    <link rel="stylesheet" href="/Styles/AdminVideos.css">
+    <link rel="stylesheet" href="/Styles/AdminImage.css">
 </head>
 
 <body>
@@ -44,11 +44,11 @@
                     <img src="../Assets/event-icon.png" alt="Event" class="menu-icon-img">
                     <span class="menu-text">EVENT MANAGEMENT</span>
                 </a>
-                <a href="/Page/AdminVideos.html" class="menu-item active">
+                <a href="/Page/AdminVideos.html" class="menu-item">
                     <img src="../Assets/video-icon.png" alt="Videos" class="menu-icon-img">
                     <span class="menu-text">VIDEOS MANAGEMENT</span>
                 </a>
-                <a href="/Page/AdminImages.html" class="menu-item">
+                <a href="/Page/AdminImages.html" class="menu-item active">
                     <img src="../Assets/images-icon.png" alt="Photos" class="menu-icon-img">
                     <span class="menu-text">PHOTOS MANAGEMENT</span>
                 </a>
@@ -62,42 +62,6 @@
                 <span class="menu-text">SIGN OUT</span>
             </a>
         </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="content-header">
-                <h2>MANAGE VIDEO DISPLAYS</h2>
-                <div class="header-line"></div>
-            </div>
-
-            <!-- Add Video Form -->
-            <div class="form-card">
-                <h3 class="form-title">Add Video to Display</h3>
-                <div class="form-group">
-                    <label class="form-label">TITLE :</label>
-                    <input type="text" class="form-input" placeholder="Youtube Video Title">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">URL :</label>
-                    <input type="text" class="form-input" placeholder="Youtube Video URL Link">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">DURATION:</label>
-                    <input type="text" class="form-input" placeholder="Set Video Duration on Display">
-                </div>
-                <div class="form-actions">
-                    <button class="btn-add">ADD VIDEO</button>
-                    <button class="btn-cancel">CANCEL</button>
-                </div>
-            </div>
-
-            <!-- Videos on Display -->
-            <h3 class="section-title">Videos Currently on Display</h3>
-            <div class="video-grid" id="videoGrid">
-                <!-- Video cards populated here -->
-            </div>
-        </main>
-    </div>
 
 </body>
 
