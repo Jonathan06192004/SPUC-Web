@@ -62,7 +62,7 @@ body > * {
     display: flex;
     align-items: center;
     padding: 2vh clamp(0px, 3vw, 19px);
-    margin-right: clamp(-116px, -10vw, -158px);
+    margin-right: clamp(-132px, -10vw, -158px);
     z-index: 1;
 }
 
@@ -119,9 +119,9 @@ body > * {
 
 .rectangle-yellow {
     position: absolute;
-    left: clamp(11px, -3vw, -30px);
+    left: clamp(13px, -3vw, -30px);
     top: clamp(42px, 4vh, 70px);
-    width: clamp(60px, 6vw, 120px);
+    width: clamp(60px, 6.5vw, 130px);
     height: 76%;
     background: url(../Assets/rectangle-yellow.png) no-repeat center center;
     background-size: 100% 102%;
