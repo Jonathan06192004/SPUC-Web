@@ -259,7 +259,7 @@ function getVideoId(url) {
 }
 
 function parseDuration(durationStr) {
-    if (!durationStr) return 30000; // default 30 seconds
+    if (!durationStr) return 30000;
     
     const match = durationStr.match(/(\d+)([smh])/i);
     if (!match) return 30000;
@@ -267,23 +267,36 @@ function parseDuration(durationStr) {
     const value = parseInt(match[1]);
     const unit = match[2].toLowerCase();
     
+    let ms = 0;
     switch(unit) {
-        case 's': return value * 1000;
-        case 'm': return value * 60 * 1000;
-        case 'h': return value * 60 * 60 * 1000;
-        default: return 30000;
+        case 's': ms = value * 1000; break;
+        case 'm': ms = value * 60 * 1000; break;
+        case 'h': ms = value * 60 * 60 * 1000; break;
+        default: ms = 30000;
     }
+    
+    console.log(`Parsed duration: ${durationStr} = ${ms}ms`);
+    return ms;
 }
 
 function playVideo(index) {
-    if (videoList.length === 0) return;
+    if (videoList.length === 0) {
+        console.log('No videos in list');
+        return;
+    }
     
     currentVideoIndex = index % videoList.length;
     const video = videoList[currentVideoIndex];
+    
+    console.log(`Playing video ${currentVideoIndex}:`, video);
+    
     const videoId = getVideoId(video.url);
     
     if (videoId) {
-        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`;
+        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0`;
+        
+        const videoBox = document.querySelector('.video-box');
+        videoBox.innerHTML = '';
         
         const iframe = document.createElement('iframe');
         iframe.src = embedUrl;
@@ -293,34 +306,45 @@ function playVideo(index) {
         iframe.allow = 'autoplay; encrypted-media';
         iframe.allowFullscreen = true;
         
-        const videoBox = document.getElementById('youtubeVideo').parentElement;
-        videoBox.innerHTML = '';
         videoBox.appendChild(iframe);
         
         clearTimeout(videoTimer);
         const duration = parseDuration(video.duration);
+        
+        console.log(`Video will play for ${duration}ms before switching`);
+        
         videoTimer = setTimeout(() => {
+            console.log('Duration expired, playing next video');
             playVideo(currentVideoIndex + 1);
         }, duration);
+    } else {
+        console.log('Could not extract video ID from URL:', video.url);
     }
 }
 
 async function loadVideosForDisplay() {
-    const snapshot = await getDocs(collection(db, "videos"));
-    videoList = [];
-    
-    snapshot.forEach(doc => {
-        videoList.push(doc.data());
-    });
-    
-    if (videoList.length > 0) {
-        playVideo(0);
+    try {
+        const snapshot = await getDocs(collection(db, "videos"));
+        videoList = [];
+        
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            console.log('Loaded video:', data);
+            videoList.push(data);
+        });
+        
+        console.log(`Total videos loaded: ${videoList.length}`);
+        
+        if (videoList.length > 0) {
+            playVideo(0);
+        }
+    } catch (error) {
+        console.error('Error loading videos:', error);
     }
 }
 
 loadVideosForDisplay();
 
-// Reload videos every 5 minutes to check for updates
 setInterval(loadVideosForDisplay, 5 * 60 * 1000);
 
 </script>
