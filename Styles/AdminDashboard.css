@@ -457,6 +457,39 @@ body {
     box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
 }
 
+optgroup {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e3a5f;
+}
+
+option {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    color: #333;
+}
+
+.time-slot-container {
+    position: relative;
+    width: 100%;
+}
+
+.time-slot-container select {
+    width: 100%;
+}
+
+.custom-time-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    background: white;
+    color: #333;
+    font-family: 'Montserrat', sans-serif;
+}
+
 .btn-submit {
     background: #ffc107;
     color: #1e3a5f;

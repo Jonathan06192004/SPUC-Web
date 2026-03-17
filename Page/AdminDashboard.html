@@ -103,9 +103,12 @@
                 <form class="event-form" id="eventForm">
                     <div class="form-group">
                         <label for="timeSlot">SELECT TIME</label>
-                        <select id="timeSlot" class="form-control" required>
-                            <option value="">Choose time slot</option>
-                        </select>
+                        <div class="time-slot-container">
+                            <select id="timeSlot" class="form-control" required>
+                                <option value="">Choose time slot</option>
+                            </select>
+                            <input type="text" id="customTimeInput" class="form-control custom-time-input" placeholder="Enter custom time (e.g., 9:00 - 10:00 AM)" style="display: none;">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="program">SELECT PROGRAM</label>

@@ -14,8 +14,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let currentDate = new Date(2026, 2, 12);
-let selectedDate = new Date(2026, 2, 12);
+let currentDate = new Date();
+let selectedDate = new Date();
 
 const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 const dayNames = ["SUN", "MON", "TUES", "WED", "THU", "FRI", "SAT"];
@@ -149,21 +149,92 @@ function updateFormDate() {
     document.getElementById('selectedDate').textContent = `${dayName} ${monthName} ${day}, ${year}`;
 }
 
+function isToday(date) {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+}
+
 async function loadTimeSlots() {
     const timeSlotSelect = document.getElementById('timeSlot');
+    const customTimeInput = document.getElementById('customTimeInput');
     timeSlotSelect.innerHTML = '<option value="">Choose time slot</option>';
     
-    try {
-        const snapshot = await getDocs(collection(db, "timeSlots"));
-        snapshot.forEach(doc => {
-            const option = document.createElement('option');
-            option.value = doc.data().time;
-            option.textContent = doc.data().time;
-            timeSlotSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error("Error loading time slots:", error);
-    }
+    const amSlots = [
+        '6:00 - 8:00 AM',
+        '8:30 - 9:30 AM',
+        '10:00 - 11:30 AM'
+    ];
+    
+    const pmSlots = [
+        '1:00 - 2:30 PM',
+        '3:00 - 4:00 PM',
+        '4:30 - 5:30 PM',
+        '6:00 - 7:30 PM',
+        '8:00 - 9:00 PM'
+    ];
+    
+    // Add AM slots
+    const amGroup = document.createElement('optgroup');
+    amGroup.label = 'AM TIME SLOT';
+    amSlots.forEach(slot => {
+        const option = document.createElement('option');
+        option.value = slot;
+        option.textContent = slot;
+        amGroup.appendChild(option);
+    });
+    timeSlotSelect.appendChild(amGroup);
+    
+    // Add PM slots
+    const pmGroup = document.createElement('optgroup');
+    pmGroup.label = 'PM TIME SLOT';
+    pmSlots.forEach(slot => {
+        const option = document.createElement('option');
+        option.value = slot;
+        option.textContent = slot;
+        pmGroup.appendChild(option);
+    });
+    timeSlotSelect.appendChild(pmGroup);
+    
+    // Add custom time slot option
+    const customOption = document.createElement('option');
+    customOption.value = 'custom';
+    customOption.textContent = 'ADD CUSTOM TIME SLOT';
+    timeSlotSelect.appendChild(customOption);
+    
+    // Handle custom time slot selection
+    timeSlotSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'custom') {
+            timeSlotSelect.style.display = 'none';
+            customTimeInput.style.display = 'block';
+            customTimeInput.value = '';
+            customTimeInput.focus();
+        } else if (e.target.value !== '') {
+            customTimeInput.style.display = 'none';
+            timeSlotSelect.style.display = 'block';
+        }
+    });
+    
+    // Handle custom time input blur to switch back to dropdown
+    customTimeInput.addEventListener('blur', () => {
+        if (customTimeInput.value.trim() !== '') {
+            timeSlotSelect.value = customTimeInput.value;
+            customTimeInput.style.display = 'none';
+            timeSlotSelect.style.display = 'block';
+        } else {
+            timeSlotSelect.value = '';
+            customTimeInput.style.display = 'none';
+            timeSlotSelect.style.display = 'block';
+        }
+    });
+    
+    // Allow Enter key to confirm custom time
+    customTimeInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            customTimeInput.blur();
+        }
+    });
 }
 
 async function loadPrograms() {
@@ -186,7 +257,9 @@ async function loadPrograms() {
 document.getElementById('eventForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const timeSlot = document.getElementById('timeSlot').value;
+    const timeSlotSelect = document.getElementById('timeSlot');
+    const customTimeInput = document.getElementById('customTimeInput');
+    const timeSlot = timeSlotSelect.style.display === 'none' ? customTimeInput.value : timeSlotSelect.value;
     const program = document.getElementById('program').value;
     const description = document.getElementById('description').value;
     
