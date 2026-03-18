@@ -334,6 +334,21 @@ body > * {
     min-height: clamp(180px, 28vh, 320px);
 }
 
+/* --- SWAP ANIMATION --- */
+@keyframes swapIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes swapOut {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(0.95); }
+}
+
+.swap-out {
+    animation: swapOut 0.4s ease forwards;
+}
+
 /* --- CONTAINER SWAP STATES --- */
 
 /* video-box expands to fill the large list-container slot */
@@ -342,6 +357,7 @@ body > * {
     width: 100%;
     min-height: unset;
     align-self: stretch;
+    animation: swapIn 0.5s ease;
 }
 
 .video-box.swapped iframe {
@@ -356,6 +372,7 @@ body > * {
     max-width: 100%;
     overflow-y: auto;
     gap: 6px;
+    animation: swapIn 0.5s ease;
 }
 
 .list-container.swapped .schedule-header {
