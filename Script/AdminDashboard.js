@@ -49,19 +49,7 @@ function convertTimeToMinutes(timeStr) {
     return hours * 60 + minutes;
 }
 
-function isEventTimePassed(eventDate, eventTime) {
-    const eventDateTime = new Date(eventDate);
-    const eventMinutes = convertTimeToMinutes(eventTime);
-    const eventHours = Math.floor(eventMinutes / 60);
-    const eventMins = eventMinutes % 60;
-    
-    eventDateTime.setHours(eventHours, eventMins, 0, 0);
-    
-    const now = new Date();
-    return now > eventDateTime;
-}
-
-function isEventCurrentlyOngoing(eventDate, eventTime) {
+function getEventStatus(eventDate, eventTime) {
     const eventDateTime = new Date(eventDate);
     const eventMinutes = convertTimeToMinutes(eventTime);
     const eventHours = Math.floor(eventMinutes / 60);
@@ -73,7 +61,14 @@ function isEventCurrentlyOngoing(eventDate, eventTime) {
     endDateTime.setHours(eventDateTime.getHours() + 2);
     
     const now = new Date();
-    return now >= eventDateTime && now < endDateTime;
+    
+    if (now >= eventDateTime && now < endDateTime) {
+        return 'On-going';
+    } else if (now > endDateTime) {
+        return 'Done';
+    } else {
+        return 'Upcoming';
+    }
 }
 
 function updateMonthDisplay() {
@@ -508,7 +503,7 @@ async function loadScheduleForDay() {
             const scheduleItem = document.createElement('div');
             scheduleItem.className = 'schedule-item';
             
-            let status = event.status || 'Upcoming';
+            let status = getEventStatus(event.date, event.time);
             
             const statusClass = getStatusClass(status);
             
