@@ -296,7 +296,7 @@ body {
     background: white;
     font-family: 'Montserrat', sans-serif;
     font-size: 18px;
-    color: #555;
+    color: #1b3b72;
     outline: none;
 }
 
@@ -431,7 +431,7 @@ body {
     background: white;
     font-family: 'Montserrat', sans-serif;
     font-size: 18px;
-    color: #555;
+    color: #1b3b72;
     text-align: left;
     cursor: pointer;
     transition: all 0.3s ease;

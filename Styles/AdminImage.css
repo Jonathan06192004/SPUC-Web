@@ -269,7 +269,7 @@ body {
 
 .form-title {
     color: white;
-    font-size: 1.8vh;
+    font-size: 24px;
     font-weight: 600;
     margin-bottom: 25px;
 }
@@ -283,7 +283,7 @@ body {
 
 .form-label {
     color: white;
-    font-size: 1.6vh;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: 1px;
     flex-shrink: 0;
@@ -296,8 +296,8 @@ body {
     border-radius: 6px;
     background: white;
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.5vh;
-    color: #555;
+    font-size: 18px;
+    color: #1b3b72;
     cursor: pointer;
     max-width: 500px;
 }
