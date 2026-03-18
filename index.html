@@ -54,13 +54,11 @@
 <aside class="preview-area">
 
 <!-- IMAGE CAROUSEL -->
-
 <div class="image-box">
 <img id="carouselImage" src="" alt="Carousel">
 </div>
 
 <!-- VIDEO -->
-
 <div class="video-box">
 <iframe 
 id="youtubeVideo"
@@ -112,9 +110,6 @@ const year = today.getFullYear();
 document.getElementById("todayDate").innerHTML =
 `<span class="day-highlight">${dayName}</span> ${monthName} ${dateNumber}, ${year}`;
 
-
-
-
 </script>
 
 <!-- FIREBASE EVENTS -->
@@ -150,7 +145,6 @@ function convertToMinutes(timeString) {
     h = parseInt(h);
     m = m ? parseInt(m) : 0;
 
-    // Convert to 24-hour format
     if (isPM && h !== 12) h += 12;
     if (isAM && h === 12) h = 0;
 
@@ -161,7 +155,6 @@ function convertToMinutes(timeString) {
 async function loadTodayEvents() {
     const container = document.querySelector(".list-container");
     
-    // Maintain the header so it doesn't get cleared
     const headerHTML = `
         <div class="schedule-header">
             <p class="subtitle">TODAY'S SCHEDULE</p>
@@ -175,7 +168,6 @@ async function loadTodayEvents() {
     const today = new Date().toDateString();
     const snapshot = await getDocs(collection(db, "events"));
     
-    // 1. Fetch events and put them in an array
     let eventsArray = [];
     snapshot.forEach(doc => {
         const data = doc.data();
@@ -184,12 +176,10 @@ async function loadTodayEvents() {
         }
     });
 
-    // 2. Sort the array by start time
     eventsArray.sort((a, b) => {
         let [startA, endA] = a.time.split('-');
         let [startB, endB] = b.time.split('-');
         
-        // Add AM/PM to start time if missing
         if (!startA.includes('PM') && !startA.includes('AM')) {
             startA += endA.match(/(AM|PM)/i)[0];
         }
@@ -200,7 +190,6 @@ async function loadTodayEvents() {
         return convertToMinutes(startA) - convertToMinutes(startB);
     });
 
-    // 3. Render the sorted events
     if(eventsArray.length === 0) {
         const noEvents = document.createElement("div");
         noEvents.className = "schedule-row";
@@ -240,11 +229,7 @@ async function loadTodayEvents() {
 
 loadTodayEvents();
 
-/* auto refresh every minute */
-
-setInterval(()=>{
-loadTodayEvents();
-},60000);
+setInterval(()=>{ loadTodayEvents(); }, 60000);
 
 // VIDEO DISPLAY ROTATION
 
@@ -260,13 +245,10 @@ function getVideoId(url) {
 
 function parseDuration(durationStr) {
     if (!durationStr) return 30000;
-    
     const match = durationStr.match(/(\d+)([smh])/i);
     if (!match) return 30000;
-    
     const value = parseInt(match[1]);
     const unit = match[2].toLowerCase();
-    
     let ms = 0;
     switch(unit) {
         case 's': ms = value * 1000; break;
@@ -274,27 +256,18 @@ function parseDuration(durationStr) {
         case 'h': ms = value * 60 * 60 * 1000; break;
         default: ms = 30000;
     }
-    
-    console.log(`Parsed duration: ${durationStr} = ${ms}ms`);
     return ms;
 }
 
 function playVideo(index) {
-    if (videoList.length === 0) {
-        console.log('No videos in list');
-        return;
-    }
+    if (videoList.length === 0) return;
     
     currentVideoIndex = index % videoList.length;
     const video = videoList[currentVideoIndex];
-    
-    console.log(`Playing video ${currentVideoIndex}:`, video);
-    
     const videoId = getVideoId(video.url);
     
     if (videoId) {
         const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0`;
-        
         const videoBox = document.querySelector('.video-box');
         videoBox.innerHTML = '';
         
@@ -305,20 +278,12 @@ function playVideo(index) {
         iframe.frameBorder = '0';
         iframe.allow = 'autoplay; encrypted-media';
         iframe.allowFullscreen = true;
-        
         videoBox.appendChild(iframe);
         
         clearTimeout(videoTimer);
-        const duration = parseDuration(video.duration);
-        
-        console.log(`Video will play for ${duration}ms before switching`);
-        
         videoTimer = setTimeout(() => {
-            console.log('Duration expired, playing next video');
             playVideo(currentVideoIndex + 1);
-        }, duration);
-    } else {
-        console.log('Could not extract video ID from URL:', video.url);
+        }, parseDuration(video.duration));
     }
 }
 
@@ -326,26 +291,44 @@ async function loadVideosForDisplay() {
     try {
         const snapshot = await getDocs(collection(db, "videos"));
         videoList = [];
-        
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            console.log('Loaded video:', data);
-            videoList.push(data);
-        });
-        
-        console.log(`Total videos loaded: ${videoList.length}`);
-        
-        if (videoList.length > 0) {
-            playVideo(0);
-        }
+        snapshot.forEach(doc => { videoList.push(doc.data()); });
+        if (videoList.length > 0) playVideo(0);
     } catch (error) {
         console.error('Error loading videos:', error);
     }
 }
 
 loadVideosForDisplay();
-
 setInterval(loadVideosForDisplay, 5 * 60 * 1000);
+
+/* CONTAINER SWAP LOGIC */
+
+function swapContainers() {
+    const contentLayout = document.querySelector('.content-layout');
+    const listContainer = document.querySelector('.list-container');
+    const previewArea = document.querySelector('.preview-area');
+    const videoBox = document.querySelector('.video-box');
+
+    // video-box takes list-container's large spot in content-layout
+    contentLayout.insertBefore(videoBox, listContainer);
+    videoBox.classList.add('swapped');
+
+    // list-container moves into preview-area below image-box, replacing video-box's spot
+    previewArea.appendChild(listContainer);
+    listContainer.classList.add('swapped');
+
+    setTimeout(() => {
+        // restore: list-container back to content-layout (before preview-area)
+        contentLayout.insertBefore(listContainer, previewArea);
+        listContainer.classList.remove('swapped');
+
+        // restore: video-box back into preview-area
+        previewArea.appendChild(videoBox);
+        videoBox.classList.remove('swapped');
+    }, 10 * 1000);
+}
+
+setInterval(swapContainers, 30 * 1000);
 
 </script>
 

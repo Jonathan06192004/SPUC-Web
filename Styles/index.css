@@ -300,7 +300,7 @@ body > * {
     flex-direction: column;
     width: clamp(250px, 25vw, 500px);
     flex-shrink: 0;
-    gap: clamp(35px, 40px, 80px);
+    gap: clamp(10px, 1.5vh, 20px);
     margin-top: 12vh;
 }
 
@@ -332,6 +332,76 @@ body > * {
     width: 100%;
     height: 100%;
     min-height: clamp(180px, 28vh, 320px);
+}
+
+/* --- CONTAINER SWAP STATES --- */
+
+/* video-box expands to fill the large list-container slot */
+.video-box.swapped {
+    flex: 1;
+    width: 100%;
+    min-height: unset;
+    align-self: stretch;
+}
+
+.video-box.swapped iframe {
+    min-height: unset;
+    height: 100%;
+}
+
+/* list-container compresses to fit inside preview-area */
+.list-container.swapped {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+    overflow-y: auto;
+    gap: 6px;
+}
+
+.list-container.swapped .schedule-header {
+    padding-left: 6px;
+    margin-bottom: 6px;
+}
+
+.list-container.swapped .subtitle {
+    font-size: 16px;
+    padding: 5px 16px;
+    letter-spacing: 1px;
+}
+
+.list-container.swapped .date-display {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.list-container.swapped .schedule-row {
+    min-height: 44px;
+    border-radius: 12px;
+    padding: 6px 12px;
+    border-width: 2px;
+    box-shadow: none;
+    gap: 4px;
+}
+
+.list-container.swapped .time-range {
+    font-size: 13px;
+    font-weight: 800;
+    min-width: 100px;
+    padding-right: 10px;
+    border-right-width: 2px;
+}
+
+.list-container.swapped .program-name {
+    font-size: 13px;
+    font-weight: 800;
+    padding-left: 10px;
+}
+
+.list-container.swapped .ongoing-badge {
+    font-size: 10px;
+    padding: 3px 7px;
+    top: -5px;
+    right: -5px;
 }
 
 /* --- FOOTER --- */
