@@ -17,6 +17,7 @@ const db = getFirestore(app);
 let currentDate = new Date();
 let selectedDate = new Date();
 let currentEditingEventId = null;
+let eventCountMap = new Map();
 
 const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 const dayNames = ["SUN", "MON", "TUES", "WED", "THU", "FRI", "SAT"];
@@ -158,6 +159,20 @@ function navigateToMonth({ name, year }) {
     resetFormInputs();
 }
 
+async function loadEventCounts() {
+    const snapshot = await getDocs(collection(db, "events"));
+    eventCountMap = new Map();
+    snapshot.forEach(d => {
+        const { date, status } = d.data();
+        if (!date) return;
+        const entry = eventCountMap.get(date) || { count: 0, doneCount: 0 };
+        entry.count++;
+        if (status === 'Done') entry.doneCount++;
+        eventCountMap.set(date, entry);
+    });
+    generateCalendar(currentDate);
+}
+
 function generateCalendar(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -177,19 +192,48 @@ function generateCalendar(date) {
         calendarDates.appendChild(btn);
     }
     
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     for (let day = 1; day <= daysInMonth; day++) {
+        const btnDate = new Date(year, month, day);
+        const entry = eventCountMap.get(btnDate.toDateString());
+        const count = entry ? entry.count : 0;
+        const allDone = entry && entry.count > 0 && entry.doneCount === entry.count;
+        const isPast = btnDate < today;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'date-cell';
+
         const btn = document.createElement('button');
         btn.className = 'date-btn';
+        if (allDone) btn.classList.add('date-done');
+        if (isPast) btn.classList.add('date-past');
         btn.textContent = day;
         btn.type = 'button';
-        
-        const btnDate = new Date(year, month, day);
+
         if (btnDate.toDateString() === selectedDate.toDateString()) {
             btn.classList.add('selected');
         }
-        
+
         btn.addEventListener('click', () => selectDate(btnDate));
-        calendarDates.appendChild(btn);
+        wrapper.appendChild(btn);
+
+        if (count > 0) {
+            const badge = document.createElement('span');
+            badge.className = 'event-badge';
+            badge.textContent = count;
+            wrapper.appendChild(badge);
+        }
+
+        if (allDone) {
+            const check = document.createElement('span');
+            check.className = 'done-check';
+            check.innerHTML = `<svg viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="1,5 4.5,8.5 11,1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+            wrapper.appendChild(check);
+        }
+
+        calendarDates.appendChild(wrapper);
     }
     
     const totalCells = calendarDates.children.length;
@@ -229,6 +273,17 @@ function selectDate(date) {
     resetFormInputs();
     loadTimeSlots();
     loadScheduleForDay();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isPast = selectedDate < today;
+    const form = document.getElementById('eventForm');
+    const submitBtn = form.querySelector('.btn-submit');
+
+    form.querySelectorAll('select, input').forEach(el => el.disabled = isPast);
+    submitBtn.disabled = isPast;
+    submitBtn.style.opacity = isPast ? '0.4' : '1';
+    submitBtn.style.cursor = isPast ? 'not-allowed' : 'pointer';
 }
 
 function updateFormDate() {
@@ -557,6 +612,7 @@ window.deleteEvent = async function(eventId) {
             const eventRef = doc(db, "events", eventId);
             await deleteDoc(eventRef);
             alert('Event deleted successfully!');
+            await loadEventCounts();
             loadScheduleForDay();
         } catch (error) {
             console.error("Error deleting event:", error);
@@ -646,6 +702,7 @@ document.getElementById('editEventForm').addEventListener('submit', async (e) =>
         
         alert('Event updated successfully!');
         closeEditModal();
+        await loadEventCounts();
         loadScheduleForDay();
     } catch (error) {
         console.error("Error updating event:", error);
@@ -712,6 +769,7 @@ document.getElementById('eventForm').addEventListener('submit', async (e) => {
         customProgramInput.style.display = 'none';
         loadTimeSlots();
         loadPrograms();
+        await loadEventCounts();
         loadScheduleForDay();
     } catch (error) {
         console.error("Error adding event:", error);
@@ -719,7 +777,7 @@ document.getElementById('eventForm').addEventListener('submit', async (e) => {
     }
 });
 
-generateCalendar(currentDate);
+loadEventCounts();
 updateMonthDisplay();
 updateFormDate();
 loadTimeSlots();
