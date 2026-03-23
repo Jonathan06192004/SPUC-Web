@@ -49,32 +49,24 @@ form.addEventListener("submit", async function(e){
         let authenticated = false;
         let adminData = null;
 
-        if (querySnapshot.empty) {
-            errorMsg.innerHTML = "No admin documents found in database.";
-            errorMsg.style.display = "block";
-            loginBtn.innerHTML = '<span>Sign In</span><i class="fas fa-arrow-right"></i>';
-            loginBtn.disabled = false;
-            return;
-        }
-
-        let debugInfo = `Found ${querySnapshot.size} doc(s):<br>`;
         querySnapshot.forEach((docSnap) => {
             const data = docSnap.data();
-            const fields = Object.keys(data).join(", ");
-            debugInfo += `Fields: [${fields}]<br>`;
-            debugInfo += `username: "${data.username}" | password: "${data.password}"<br>`;
             if(username.trim() === (data.username || "").trim() && password.trim() === (data.password || "").trim()){
                 authenticated = true;
                 adminData = { id: docSnap.id, ...data };
             }
         });
 
-        if (!authenticated) {
-            errorMsg.innerHTML = debugInfo + `<br>You entered: "${username}" / "${password}"`;
+        if (authenticated) {
+            localStorage.setItem("isAdminLoggedIn", "true");
+            localStorage.setItem("adminId", adminData.id);
+            localStorage.setItem("adminName", adminData.name);
+            window.location.href = "AdminDashboard.html";
+        } else {
+            errorMsg.innerHTML = "Invalid username or password";
             errorMsg.style.display = "block";
             loginBtn.innerHTML = '<span>Sign In</span><i class="fas fa-arrow-right"></i>';
             loginBtn.disabled = false;
-            return;
         }
 
     } catch(error){

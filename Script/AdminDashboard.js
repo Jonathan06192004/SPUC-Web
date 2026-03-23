@@ -621,8 +621,11 @@ document.getElementById('eventForm').addEventListener('submit', async (e) => {
     
     try {
         const eventsSnapshot = await getDocs(collection(db, "events"));
-        const eventCount = eventsSnapshot.size + 1;
-        const docName = `event${eventCount}`;
+        const maxNum = eventsSnapshot.docs.reduce((max, d) => {
+            const match = d.id.match(/^event(\d+)$/);
+            return match ? Math.max(max, parseInt(match[1])) : max;
+        }, 0);
+        const docName = `event${maxNum + 1}`;
         
         await setDoc(doc(db, "events", docName), {
             date: selectedDate.toDateString(),
