@@ -360,3 +360,28 @@ body {
     object-fit: cover;
     display: block;
 }
+
+.image-card {
+    position: relative;
+}
+
+.btn-delete {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: #e53935;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.image-card:hover .btn-delete {
+    opacity: 1;
+}

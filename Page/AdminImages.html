@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Videos Management</title>
+    <title>Admin | Images Management</title>
     <link rel="icon" type="image/png" href="../Assets/HCLogo.png">
+    <link rel="stylesheet" href="/Styles/AdminImage.css">
 </head>
 
 <body>
@@ -75,11 +76,11 @@
                 <h3 class="form-title">Add Image to Display in the Loop</h3>
                 <div class="form-group">
                     <label class="form-label">Image File</label>
-                    <input type="file" class="form-input-file" accept="image/*">
+                    <input type="file" id="imageFileInput" class="form-input-file" accept="image/*">
                 </div>
                 <div class="form-actions">
-                    <button class="btn-add">ADD IMAGE</button>
-                    <button class="btn-cancel">CANCEL</button>
+                    <button class="btn-add" id="btnAdd">ADD IMAGE</button>
+                    <button class="btn-cancel" id="btnCancel">CANCEL</button>
                 </div>
             </div>
 
@@ -92,6 +93,7 @@
     </div>
 
 <script src="/Script/adminAuth.js"></script>
+<script type="module" src="/Script/AdminImages.js"></script>
 </body>
 
 </html>

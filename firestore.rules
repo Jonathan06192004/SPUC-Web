@@ -32,5 +32,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Allow read/write access to images collection
+    match /images/{document=**} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }
