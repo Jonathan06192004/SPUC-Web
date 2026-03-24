@@ -316,7 +316,11 @@ function showImage(index) {
     if (imageList.length === 0) return;
     currentImageIndex = index % imageList.length;
     const img = document.getElementById('carouselImage');
-    img.src = imageList[currentImageIndex].url;
+    img.style.opacity = '0';
+    setTimeout(() => {
+        img.src = imageList[currentImageIndex].url;
+        img.style.opacity = '1';
+    }, 500);
     imageTimer = setTimeout(() => showImage(currentImageIndex + 1), 5000);
 }
 
