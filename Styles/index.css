@@ -32,13 +32,14 @@ html, body {
     position: absolute;
     top: 0;
     left: 0;
-    background: url('../Assets/BG.jpg') no-repeat center center;
+    background: url('../Assets/backgroundPicture.png') no-repeat center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
+/* BACKGROUND LIGHTBLUE COMMENTED OUT
 .scale-wrapper::before {
     content: '';
     position: absolute;
@@ -51,6 +52,7 @@ html, body {
     z-index: 0;
     pointer-events: none;
 }
+*/
 
 .scale-wrapper > * {
     position: relative;
@@ -175,6 +177,7 @@ html, body {
     z-index: 1;
     width: 34%;
     margin-left: auto;
+    margin-top: 318px;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 5% 100%);
 }
 
@@ -199,7 +202,7 @@ html, body {
     display: flex;
     flex-direction: column;
     padding: 20px 80px;
-    margin-top: -60px;
+    margin-top: -15px;
 }
 
 .schedule-header {
