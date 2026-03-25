@@ -361,7 +361,7 @@ setInterval(loadVideosForDisplay, 5 * 60 * 1000);
 let imageList = [];
 let currentImageIndex = 0;
 let imageTimer = null;
-let activeSlot = 'A';
+let activeSlot = 'B';
 
 function showImage(index) {
     if (imageList.length === 0) return;
@@ -369,14 +369,19 @@ function showImage(index) {
 
     const imgA = document.getElementById('carouselImageA');
     const imgB = document.getElementById('carouselImageB');
-    const incoming = activeSlot === 'A' ? imgA : imgB;
-    const outgoing = activeSlot === 'A' ? imgB : imgA;
+    const incoming = activeSlot === 'A' ? imgB : imgA;
+    const outgoing = activeSlot === 'A' ? imgA : imgB;
 
-    incoming.src = imageList[currentImageIndex].url;
-    incoming.className = 'slide-in';
-    outgoing.className = 'slide-out';
+    const nextUrl = imageList[currentImageIndex].url;
+    const preload = new Image();
+    preload.onload = () => {
+        incoming.src = nextUrl;
+        incoming.className = 'slide-in';
+        outgoing.className = 'slide-out';
+        activeSlot = activeSlot === 'A' ? 'B' : 'A';
+    };
+    preload.src = nextUrl;
 
-    activeSlot = activeSlot === 'A' ? 'B' : 'A';
     imageTimer = setTimeout(() => showImage(currentImageIndex + 1), 5000);
 }
 
