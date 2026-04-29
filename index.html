@@ -235,7 +235,7 @@ async function loadTodayEvents() {
         `;
         container.appendChild(noEvents);
     } else {
-        eventsArray.forEach(data => {
+            eventsArray.forEach(data => {
             const { startMinutes, endMinutes } = parseEventTimes(data.time);
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -255,6 +255,8 @@ async function loadTodayEvents() {
             container.appendChild(row);
         });
     }
+
+    container.classList.toggle('compact', eventsArray.length >= 5);
 }
 
 let lastIsPM = null;

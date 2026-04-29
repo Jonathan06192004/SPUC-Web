@@ -818,17 +818,21 @@ option[value="custom"] {
 .schedule-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
+    max-height: 40vh;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
 .schedule-item {
     background: #f9f9f9;
     border-left: 4px solid #1b3b72;
-    padding: 15px;
+    padding: clamp(8px, 1.2vh, 15px);
     border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .schedule-item-content {
@@ -836,16 +840,16 @@ option[value="custom"] {
 }
 
 .schedule-item-time {
-    font-size: 20px;
+    font-size: clamp(13px, 1.5vh, 20px);
     font-weight: 600;
     color: #1b3b72;
-    margin-bottom: 7px;
+    margin-bottom: 4px;
 }
 
 .schedule-item-program {
-    font-size: 24px;
+    font-size: clamp(14px, 1.8vh, 24px);
     color: #1b3b72;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 }
 
 .schedule-item-description {
@@ -860,11 +864,11 @@ option[value="custom"] {
 }
 
 .schedule-item-btn {
-    padding: 8px 15px;
+    padding: clamp(5px, 0.8vh, 8px) clamp(8px, 1.2vw, 15px);
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 20px;
+    font-size: clamp(13px, 1.5vh, 20px);
     font-weight: 600;
     transition: all 0.3s ease;
 }
@@ -1100,12 +1104,12 @@ option[value="custom"] {
 /* Status Badge */
 .schedule-item-status {
     display: inline-block;
-    padding: 6px 12px;
+    padding: clamp(3px, 0.5vh, 6px) clamp(6px, 1vw, 12px);
     border-radius: 20px;
-    font-size: 16px;
+    font-size: clamp(11px, 1.3vh, 16px);
     font-weight: 600;
     letter-spacing: 0.5px;
-    margin-top: 8px;
+    margin-top: 4px;
 }
 
 .status-ongoing {
