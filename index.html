@@ -263,7 +263,7 @@ let lastIsPM = null;
 
 loadTodayEvents();
 
-setInterval(()=>{ loadTodayEvents(); }, 10 * 60 * 1000);
+setInterval(()=>{ loadTodayEvents(); }, 60 * 1000);
 
 // VIDEO DISPLAY ROTATION
 
@@ -273,6 +273,9 @@ let videoTimer = null;
 let isSwapped = false;
 let isPlaying = false;
 let activeLiveId = null;
+let ytPlayer = null;
+let ytPlayerReady = false;
+let pendingOnEnd = null;
 
 function getVideoId(url) {
     const regExp = /(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/live\/)([^#\&\?]{11})/;
@@ -280,34 +283,46 @@ function getVideoId(url) {
     return match ? match[1] : null;
 }
 
-function parseDuration(durationStr) {
-    if (!durationStr) return 30000;
-    const match = durationStr.match(/(\d+)([smh])/i);
-    if (!match) return 10 * 60 * 1000;
-    const value = parseInt(match[1]);
-    const unit = match[2].toLowerCase();
-    switch(unit) {
-        case 's': return value * 1000;
-        case 'm': return value * 60 * 1000;
-        case 'h': return value * 60 * 60 * 1000;
-        default:  return 10 * 60 * 1000;
+// Load YouTube IFrame API
+const ytScript = document.createElement('script');
+ytScript.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(ytScript);
+
+window.onYouTubeIframeAPIReady = function() {
+    ytPlayerReady = true;
+    if (pendingOnEnd) {
+        const { videoId, muted, onEnd } = pendingOnEnd;
+        pendingOnEnd = null;
+        createYTPlayer(videoId, muted, onEnd);
+    }
+};
+
+function createYTPlayer(videoId, muted, onEnd) {
+    const videoBox = document.querySelector('.video-box');
+    videoBox.innerHTML = '<div id="yt-player-el"></div>';
+    if (ytPlayer) { try { ytPlayer.destroy(); } catch(e) {} }
+    ytPlayer = new YT.Player('yt-player-el', {
+        width: '100%',
+        height: '100%',
+        videoId,
+        playerVars: { autoplay: 1, mute: muted ? 1 : 0, controls: 1, origin: location.origin },
+        events: {
+            onStateChange: (e) => {
+                if (e.data === YT.PlayerState.ENDED) onEnd();
+            }
+        }
+    });
+}
+
+function renderVideo(videoId, muted, onEnd) {
+    if (ytPlayerReady) {
+        createYTPlayer(videoId, muted, onEnd);
+    } else {
+        pendingOnEnd = { videoId, muted, onEnd };
     }
 }
 
-function renderVideo(videoId, muted) {
-    const videoBox = document.querySelector('.video-box');
-    videoBox.innerHTML = '';
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muted ? 1 : 0}&controls=1&origin=${location.origin}`;
-    iframe.width = '100%';
-    iframe.height = '100%';
-    iframe.frameBorder = '0';
-    iframe.allow = 'autoplay; encrypted-media';
-    iframe.allowFullscreen = true;
-    videoBox.appendChild(iframe);
-}
-
-// Step 1: Play video in normal (small) mode, muted. After duration -> enter swap with next video.
+// Step 1: Play video in normal (small) mode. When video ends -> enter swap with next video.
 function playNormal(index) {
     if (videoList.length === 0) return;
     currentVideoIndex = index % videoList.length;
@@ -315,11 +330,10 @@ function playNormal(index) {
     const videoId = getVideoId(video.url);
     if (!videoId) { playNormal(currentVideoIndex + 1); return; }
     clearTimeout(videoTimer);
-    renderVideo(videoId, false);
-    videoTimer = setTimeout(() => enterSwap(currentVideoIndex + 1), parseDuration(video.duration));
+    renderVideo(videoId, false, () => enterSwap(currentVideoIndex + 1));
 }
 
-// Step 2: Swap layout and play the given index unmuted. After duration -> exit swap.
+// Step 2: Swap layout and play the given index. When video ends -> play next in swap, or exit if no more live videos.
 function enterSwap(nextIndex) {
     const contentLayout = document.querySelector('.content-layout');
     const listContainer = document.querySelector('.list-container');
@@ -339,8 +353,21 @@ function enterSwap(nextIndex) {
     const videoId = getVideoId(video.url);
     if (!videoId) { enterSwap(currentVideoIndex + 1); return; }
     clearTimeout(videoTimer);
-    renderVideo(videoId, false);
-    videoTimer = setTimeout(() => exitSwap(), parseDuration(video.duration));
+
+    const isLive = !!video.isLive;
+    const onEnd = isLive
+        ? () => {
+            // Live video ended — check if there's another live video next, otherwise exit swap
+            const nextIdx = (currentVideoIndex + 1) % videoList.length;
+            if (videoList[nextIdx] && videoList[nextIdx].isLive) {
+                enterSwap(nextIdx);
+            } else {
+                exitSwap();
+            }
+        }
+        : () => exitSwap();
+
+    renderVideo(videoId, false, onEnd);
 }
 
 // Step 3: Restore layout and play next video in normal mode.
@@ -380,6 +407,7 @@ async function loadVideosForDisplay() {
             clearTimeout(videoTimer);
             isPlaying = true;
             currentVideoIndex = -1;
+            if (ytPlayer) { try { ytPlayer.destroy(); } catch(e) {} ytPlayer = null; }
             enterSwap(0);
             return;
         }
