@@ -91,7 +91,7 @@ async function addVideo() {
         return;
     }
     
-    if (!duration) {
+    if (!isLive && !duration) {
         showModal("Please select a duration", 'error');
         return;
     }
@@ -116,8 +116,12 @@ async function addVideo() {
         const nextNumber = maxNumber + 1;
         const docId = `video${nextNumber}`;
         
-        const videoData = { title, url, duration };
-        if (isLive) videoData.isLive = true;
+        const videoData = { title, url };
+        if (isLive) {
+            videoData.isLive = true;
+        } else {
+            videoData.duration = duration;
+        }
 
         await setDoc(doc(db, "videos", docId), videoData);
         
@@ -212,6 +216,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
+    document.getElementById("isLiveCheckbox").addEventListener("change", (e) => {
+        document.getElementById("durationGroup").style.display = e.target.checked ? "none" : "";
+    });
+
     document.querySelector(".btn-add").addEventListener("click", addVideo);
     document.querySelector(".btn-cancel").addEventListener("click", () => {
         document.querySelector(".form-input[placeholder='Youtube Video Title']").value = "";
@@ -220,5 +228,6 @@ document.addEventListener("DOMContentLoaded", () => {
         durationBtn.textContent = "Select Duration";
         customDurationInput.value = "";
         document.getElementById("isLiveCheckbox").checked = false;
+        document.getElementById("durationGroup").style.display = "";
     });
 });
