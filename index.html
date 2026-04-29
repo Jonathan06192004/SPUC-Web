@@ -269,6 +269,8 @@ let currentVideoIndex = 0;
 let videoList = [];
 let videoTimer = null;
 let isSwapped = false;
+let isPlaying = false;
+let activeLiveId = null;
 
 function getVideoId(url) {
     const regExp = /(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/live\/)([^#\&\?]{11})/;
@@ -282,14 +284,12 @@ function parseDuration(durationStr) {
     if (!match) return 10 * 60 * 1000;
     const value = parseInt(match[1]);
     const unit = match[2].toLowerCase();
-    let ms = 0;
     switch(unit) {
-        case 's': ms = value * 1000; break;
-        case 'm': ms = value * 60 * 1000; break;
-        case 'h': ms = value * 60 * 60 * 1000; break;
-        default: ms = 10 * 60 * 1000;
+        case 's': return value * 1000;
+        case 'm': return value * 60 * 1000;
+        case 'h': return value * 60 * 60 * 1000;
+        default:  return 10 * 60 * 1000;
     }
-    return ms;
 }
 
 function renderVideo(videoId, muted) {
@@ -305,46 +305,43 @@ function renderVideo(videoId, muted) {
     videoBox.appendChild(iframe);
 }
 
-function playVideo(index) {
+// Step 1: Play video in normal (small) mode, muted. After duration -> enter swap with next video.
+function playNormal(index) {
     if (videoList.length === 0) return;
-
     currentVideoIndex = index % videoList.length;
     const video = videoList[currentVideoIndex];
     const videoId = getVideoId(video.url);
-    if (!videoId) return;
-
+    if (!videoId) { playNormal(currentVideoIndex + 1); return; }
     clearTimeout(videoTimer);
-
-    if (video.isLive) {
-        if (!isSwapped) enterSwap(true);
-        else {
-            renderVideo(videoId, false);
-            videoTimer = setTimeout(() => exitSwap(), parseDuration(video.duration));
-        }
-        return;
-    }
-
-    renderVideo(videoId, !isSwapped);
-    const duration = parseDuration(video.duration);
-    videoTimer = setTimeout(() => { isSwapped ? exitSwap() : enterSwap(false); }, duration);
+    renderVideo(videoId, false);
+    videoTimer = setTimeout(() => enterSwap(currentVideoIndex + 1), parseDuration(video.duration));
 }
 
-function enterSwap(forLive = false) {
+// Step 2: Swap layout and play the given index unmuted. After duration -> exit swap.
+function enterSwap(nextIndex) {
     const contentLayout = document.querySelector('.content-layout');
     const listContainer = document.querySelector('.list-container');
     const previewArea = document.querySelector('.preview-area');
     const videoBox = document.querySelector('.video-box');
 
-    isSwapped = true;
-    contentLayout.insertBefore(videoBox, listContainer);
-    videoBox.classList.add('swapped');
-    previewArea.appendChild(listContainer);
-    listContainer.classList.add('swapped');
+    if (!isSwapped) {
+        isSwapped = true;
+        contentLayout.insertBefore(videoBox, listContainer);
+        videoBox.classList.add('swapped');
+        previewArea.appendChild(listContainer);
+        listContainer.classList.add('swapped');
+    }
 
-    const nextIndex = forLive ? currentVideoIndex : currentVideoIndex + 1;
-    playVideo(nextIndex);
+    currentVideoIndex = nextIndex % videoList.length;
+    const video = videoList[currentVideoIndex];
+    const videoId = getVideoId(video.url);
+    if (!videoId) { enterSwap(currentVideoIndex + 1); return; }
+    clearTimeout(videoTimer);
+    renderVideo(videoId, false);
+    videoTimer = setTimeout(() => exitSwap(), parseDuration(video.duration));
 }
 
+// Step 3: Restore layout and play next video in normal mode.
 function exitSwap() {
     const contentLayout = document.querySelector('.content-layout');
     const listContainer = document.querySelector('.list-container');
@@ -357,13 +354,10 @@ function exitSwap() {
     setTimeout(() => {
         contentLayout.insertBefore(listContainer, previewArea);
         listContainer.classList.remove('swapped', 'swap-out');
-
         isSwapped = false;
         previewArea.appendChild(videoBox);
         videoBox.classList.remove('swapped', 'swap-out');
-
-        // Advance to next video and play it muted in normal mode
-        playVideo(currentVideoIndex + 1);
+        playNormal(currentVideoIndex + 1);
     }, 400);
 }
 
@@ -372,9 +366,30 @@ async function loadVideosForDisplay() {
         const snapshot = await getDocs(collection(db, "videos"));
         const newList = [];
         snapshot.forEach(doc => { newList.push(doc.data()); });
-        newList.sort((a, b) => (b.isLive ? 1 : 0) - (a.isLive ? 1 : 0));
-        videoList = newList;
-        if (videoList.length > 0 && videoTimer === null) playVideo(0);
+
+        const liveVideos = newList.filter(v => v.isLive);
+        const regularVideos = newList.filter(v => !v.isLive);
+        const newLiveId = liveVideos.length > 0 ? getVideoId(liveVideos[0].url) : null;
+
+        // New live video detected — interrupt and prioritize it in swapped mode
+        if (newLiveId && newLiveId !== activeLiveId) {
+            activeLiveId = newLiveId;
+            videoList = [...liveVideos, ...regularVideos];
+            clearTimeout(videoTimer);
+            isPlaying = true;
+            currentVideoIndex = -1;
+            enterSwap(0);
+            return;
+        }
+
+        if (!newLiveId) activeLiveId = null;
+        videoList = [...liveVideos, ...regularVideos];
+
+        // Start playback only on first load
+        if (!isPlaying && videoList.length > 0) {
+            isPlaying = true;
+            playNormal(0);
+        }
     } catch (error) {
         console.error('Error loading videos:', error);
     }
