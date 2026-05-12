@@ -221,6 +221,26 @@ body {
     background: rgba(255, 213, 3, 0.15);
     transform: translateX(5px);
 }
+
+.refresh-display-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.refresh-display-btn.refresh-reloading {
+    color: #aad4ff;
+    animation: refresh-pulse 1s infinite;
+}
+
+.refresh-display-btn.refresh-done {
+    color: #4caf50;
+}
+
+@keyframes refresh-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
     border-radius: 0;
     box-shadow: none;
     font-family: 'Montserrat', sans-serif;

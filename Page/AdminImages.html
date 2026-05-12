@@ -115,13 +115,47 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const _app = initializeApp({ apiKey: "AIzaSyB32ggdpwiNyZ0BKXeqwhVG7_Ei2qLF-Pw", authDomain: "hcsp-scheduling-system.firebaseapp.com", projectId: "hcsp-scheduling-system", storageBucket: "hcsp-scheduling-system.firebasestorage.app", messagingSenderId: "498610158944", appId: "1:498610158944:web:d4c6778a849016e12c7205" });
 const _db = getFirestore(_app);
-window.refreshDisplay = () => setDoc(doc(_db, 'system', 'refresh'), { trigger: Date.now() });
+const _refreshDoc = doc(_db, 'system', 'refresh');
+const _btn = () => document.querySelector('.refresh-display-btn');
+const _label = () => document.querySelector('.refresh-display-btn .menu-text');
+let _refreshReady = false;
+onSnapshot(_refreshDoc, (snap) => {
+    if (!_refreshReady) { _refreshReady = true; return; }
+    const status = snap.data()?.status;
+    const btn = _btn(); const label = _label();
+    if (status === 'reloading') {
+        btn.classList.add('refresh-reloading');
+        btn.classList.remove('refresh-done');
+        label.textContent = 'REFRESHING...';
+    } else if (status === 'done') {
+        btn.classList.remove('refresh-reloading');
+        btn.classList.add('refresh-done');
+        label.textContent = '\u2714 REFRESHED';
+        setTimeout(() => { btn.classList.remove('refresh-done'); btn.disabled = false; label.textContent = 'REFRESH DISPLAY'; }, 2500);
+    }
+});
+window.refreshDisplay = async () => {
+    const btn = _btn(); const label = _label();
+    btn.disabled = true;
+    label.textContent = 'SENDING...';
+    await setDoc(_refreshDoc, { trigger: Date.now(), status: 'pending' });
+    btn.classList.add('refresh-reloading');
+    label.textContent = 'REFRESHING...';
+    setTimeout(() => {
+        if (btn.disabled) {
+            btn.classList.remove('refresh-reloading', 'refresh-done');
+            btn.disabled = false;
+            label.textContent = 'REFRESH DISPLAY';
+        }
+    }, 15000);
+};
 </script>
 <script src="/Script/adminAuth.js"></script>
 <script type="module" src="/Script/AdminImages.js"></script>
 </body>
+</html>
 
 </html>
